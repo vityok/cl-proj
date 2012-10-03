@@ -1,6 +1,8 @@
 ;;; Different utility functions for more convenient usage of the
 ;;; Proj.4 library
 
+(in-package :cl-proj)
+
 (defun render-point (ox oy extent size &key
 		     (src-cs "+proj=latlong +ellps=WGS84 +datum=WGS84")
 		     (dst-cs "+proj=utm +zone=35 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
@@ -14,19 +16,19 @@ that is displayed within the screen with SIZE.
  @param oY Northing lat?
   "
 
-  (let* ((wgsProj (pj_init_plus src-cs))
-	 (mapProj (pj_init_plus dst-cs))
+  (let* ((wgsProj (pj-init-plus src-cs))
+	 (mapProj (pj-init-plus dst-cs))
 	 (o.x (cffi:foreign-alloc :double))
 	 (o.y (cffi:foreign-alloc :double))
 	 (o.z (cffi:foreign-alloc :double)))
 
-    (setf (cffi:mem-ref o.x :double) (* (float ox 0.0d0) DEG_TO_RAD))
-    (setf (cffi:mem-ref o.y :double) (* (float oy 0.0d0) DEG_TO_RAD))
+    (setf (cffi:mem-ref o.x :double) (* (float ox 0.0d0) +DEG-TO-RAD+))
+    (setf (cffi:mem-ref o.y :double) (* (float oy 0.0d0) +DEG-TO-RAD+))
     (setf (cffi:mem-ref o.z :double) 0.0d0)
 
-    (pj_transform wgsProj mapProj 1 1 o.x o.y o.z)
-    (pj_free wgsProj)
-    (pj_free mapProj)
+    (pj-transform wgsProj mapProj 1 1 o.x o.y o.z)
+    (pj-free wgsProj)
+    (pj-free mapProj)
 
     (let ((oMap.width  (getf size :width))
 	  (oMap.height (getf size :height))
