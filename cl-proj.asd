@@ -25,6 +25,13 @@
 ;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ;; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+(in-package :cl-user)
+
+(defpackage :cl-proj-asd
+  (:use :cl :asdf))
+
+(in-package :cl-proj-asd)
+
 
 (asdf:defsystem :cl-proj
     :description "CL-PROJ provides Proj.4 library bindings"
