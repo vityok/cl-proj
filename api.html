@@ -310,7 +310,18 @@ Forward cartographic projection.
 <p><br>[Function]<br><a class=none name='pj-init-plus'><b>pj-init-plus</b> <i>arg0</i> =&gt; <i>result</i></a>
 <blockquote><br>
 
+Convert a string representation of a coordinate system definition
+into an internal representation.
 
+This function converts a string representation of a coordinate system
+definition into a projPJ object suitable for use with other API
+functions. On failure the function will return NULL and set
+pj_errno. The definition should be of the general form &quot;+proj=tmerc
++lon_0 +datum=WGS84&quot;. Refer to PROJ.4 documentation and the General
+Parameters notes for additional detail.
+
+&lt;p&gt;Coordinate system objects allocated with PJ-INIT-PLUS should be
+deallocated with PJ-FREE.
 
 </blockquote>
 
@@ -444,7 +455,7 @@ Inverse cartographic projection.
 
 Transform between coordinate systems.
 
-The PJ-TRANSFORM function may be used to transform points between the
+&lt;p&gt;The PJ-TRANSFORM function may be used to transform points between the
 two provided coordinate systems.  In addition to converting between
 cartographic projection coordinates and geographic coordinates, this
 function also takes care of datum shifts if possible between the
@@ -456,8 +467,24 @@ with the output values.  The point_offset should indicate the spacing
 the of x,y,z arrays, normally 1.  The function returns zero on
 success, or the error number (also in PJ-ERRNO) on failure.
 
-Memory associated with the projection may be freed with PJ-FREE.
+The z array may be passed as NULL if Z values are not available. 
 
+&lt;ul&gt;&lt;li&gt;src: source (input) coordinate system. 
+
+&lt;li&gt;dst: destination (output) coordinate system. 
+
+&lt;li&gt;point_count: the number of points to be processed (the size of the x/y/z arrays). 
+
+&lt;li&gt;point_offset: the step size from value to value (measured in
+doubles) within the x/y/z arrays - normally 1 for a packed array. May
+be used to operate on xyz interleaved point arrays.
+
+&lt;li&gt;x/y/z: The array of X, Y and Z coordinate values passed as input,
+and modified in place for output. The Z may optionally be NULL.
+
+&lt;li&gt;return: The return is zero on success, or a PROJ.4 error code.&lt;/ul&gt;
+
+&lt;p&gt;Memory associated with the projection may be freed with PJ-FREE.
 
 </blockquote>
 
@@ -471,11 +498,11 @@ Memory associated with the projection may be freed with PJ-FREE.
 
 Renders the point with given coordinates using the Proj API.
 
-EXTENT specifies the geographic extents of the original surface area
+&lt;p&gt;EXTENT specifies the geographic extents of the original surface area
 that is displayed within the screen with SIZE.
 
- @param oX Easting long?
- @param oY Northing lat?
+&lt;p&gt;oX Easting long?
+&lt;p&gt;oY Northing lat?
   
 
 </blockquote>

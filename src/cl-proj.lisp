@@ -2,6 +2,31 @@
 ;;; Version 2.0.4 and then hand-crafted to make the glue code more usable.
 ;;;
 
+;; Copyright (c) 2012, Victor Anyakin <anyakinvictor@yahoo.com>
+;; All rights reserved.
+
+;; Redistribution and use in source and binary forms, with or without
+;; modification, are permitted provided that the following conditions are met:
+;;     * Redistributions of source code must retain the above copyright
+;;       notice, this list of conditions and the following disclaimer.
+;;     * Redistributions in binary form must reproduce the above copyright
+;;       notice, this list of conditions and the following disclaimer in the
+;;       documentation and/or other materials provided with the distribution.
+;;     * Neither the name of the organization nor the
+;;       names of its contributors may be used to endorse or promote products
+;;       derived from this software without specific prior written permission.
+
+;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+;; ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+;; WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+;; DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+;; DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+;; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+;; ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+;; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 (in-package :cl-proj)
 
 (cl:defconstant +PJ-VERSION+ 470)
@@ -33,7 +58,7 @@
 (cffi:defcfun ("pj_transform" PJ-TRANSFORM) :int
   "Transform between coordinate systems.
 
-The PJ-TRANSFORM function may be used to transform points between the
+<p>The PJ-TRANSFORM function may be used to transform points between the
 two provided coordinate systems.  In addition to converting between
 cartographic projection coordinates and geographic coordinates, this
 function also takes care of datum shifts if possible between the
@@ -45,8 +70,25 @@ with the output values.  The point_offset should indicate the spacing
 the of x,y,z arrays, normally 1.  The function returns zero on
 success, or the error number (also in PJ-ERRNO) on failure.
 
-Memory associated with the projection may be freed with PJ-FREE.
-"
+The z array may be passed as NULL if Z values are not available. 
+
+<ul><li>src: source (input) coordinate system. 
+
+<li>dst: destination (output) coordinate system. 
+
+<li>point_count: the number of points to be processed (the size of the x/y/z arrays). 
+
+<li>point_offset: the step size from value to value (measured in
+doubles) within the x/y/z arrays - normally 1 for a packed array. May
+be used to operate on xyz interleaved point arrays.
+
+<li>x/y/z: The array of X, Y and Z coordinate values passed as input,
+and modified in place for output. The Z may optionally be NULL.
+
+<li>return: The return is zero on success, or a PROJ.4 error code.</ul>
+
+<p>Memory associated with the projection may be freed with PJ-FREE."
+
   (src :pointer)
   (dst :pointer)
   (point_count :long)
@@ -121,6 +163,18 @@ Memory associated with the projection may be freed with PJ-FREE.
   (arg1 :pointer))
 
 (cffi:defcfun ("pj_init_plus" PJ-INIT-PLUS) :pointer
+  "Convert a string representation of a coordinate system definition
+into an internal representation.
+
+This function converts a string representation of a coordinate system
+definition into a projPJ object suitable for use with other API
+functions. On failure the function will return NULL and set
+pj_errno. The definition should be of the general form \"+proj=tmerc
++lon_0 +datum=WGS84\". Refer to PROJ.4 documentation and the General
+Parameters notes for additional detail.
+
+<p>Coordinate system objects allocated with PJ-INIT-PLUS should be
+deallocated with PJ-FREE."
   (arg0 :string))
 
 (cffi:defcfun ("pj_get_def" PJ-GET-DEF) :string
@@ -148,5 +202,6 @@ Memory associated with the projection may be freed with PJ-FREE.
 (cffi:defcfun ("pj_release_lock" PJ-RELEASE-LOCK) :void)
 
 (cffi:defcfun ("pj_cleanup_lock" PJ-CLEANUP-LOCK) :void)
+
 
 
