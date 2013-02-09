@@ -1,6 +1,5 @@
-;;; Generate API documentation using the DOCUMENTATION-TEMPLATE from
-;;; Edi Weitz. Additional modifications are then required to fix
-;;; references and some notes.
+;;; Generate API documentation using the ATDOC package developed by
+;;; David Lichteblau
 ;;;
 ;;; Just cd to the doc directory and run:
 ;;;
