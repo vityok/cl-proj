@@ -33,9 +33,7 @@
 ;; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ql:quickload "atdoc")
-
-(require 'cl-proj)
-;; (documentation-template:create-template :cl-proj :target "api.html")
+(ql:quickload "cl-proj")
 
 (atdoc:generate-html-documentation
  '(:cl-proj)
