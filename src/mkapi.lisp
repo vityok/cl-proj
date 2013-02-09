@@ -2,11 +2,11 @@
 ;;; Edi Weitz. Additional modifications are then required to fix
 ;;; references and some notes.
 ;;;
-;;; Just run:
+;;; Just cd to the doc directory and run:
 ;;;
-;;; sbcl --load mkapi.lisp
+;;; sbcl --load ../src/mkapi.lisp
 ;;;
-;;; This will produce api.html file in the current directory.
+;;; This will produce documentation files in the current directory.
 
 ;; Copyright (c) 2012, Victor Anyakin <anyakinvictor@yahoo.com>
 ;; All rights reserved.
@@ -33,9 +33,19 @@
 ;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ;; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-(ql:quickload "documentation-template")
+(ql:quickload "atdoc")
+
 (require 'cl-proj)
-(documentation-template:create-template :cl-proj :target "api.html")
+;; (documentation-template:create-template :cl-proj :target "api.html")
+
+(atdoc:generate-html-documentation
+ '(:cl-proj)
+ "./"
+ :index-title "Common Lisp geographic projections API reference"
+ :heading "Proj.4 wrapper for Lisp"
+ :single-page-p t
+ :include-internal-symbols-p nil)
+
 (quit)
 
 ;; EOF
