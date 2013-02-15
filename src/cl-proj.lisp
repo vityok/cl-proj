@@ -58,7 +58,7 @@
 (cffi:defcfun ("pj_transform" PJ-TRANSFORM) :int
   "Transform between coordinate systems.
 
-<p>The PJ-TRANSFORM function may be used to transform points between the
+The PJ-TRANSFORM function may be used to transform points between the
 two provided coordinate systems.  In addition to converting between
 cartographic projection coordinates and geographic coordinates, this
 function also takes care of datum shifts if possible between the
@@ -72,22 +72,22 @@ success, or the error number (also in PJ-ERRNO) on failure.
 
 The z array may be passed as NULL if Z values are not available. 
 
-<ul><li>src: source (input) coordinate system. 
+SRC: source (input) coordinate system. 
 
-<li>dst: destination (output) coordinate system. 
+DST: destination (output) coordinate system. 
 
-<li>point_count: the number of points to be processed (the size of the x/y/z arrays). 
+POINT_COUNT: the number of points to be processed (the size of the x/y/z arrays). 
 
-<li>point_offset: the step size from value to value (measured in
+POINT_OFFSET: the step size from value to value (measured in
 doubles) within the x/y/z arrays - normally 1 for a packed array. May
 be used to operate on xyz interleaved point arrays.
 
-<li>x/y/z: The array of X, Y and Z coordinate values passed as input,
+X/Y/Z: The array of X, Y and Z coordinate values passed as input,
 and modified in place for output. The Z may optionally be NULL.
 
-<li>return: The return is zero on success, or a PROJ.4 error code.</ul>
+return: The return is zero on success, or a PROJ.4 error code.
 
-<p>Memory associated with the projection may be freed with PJ-FREE."
+Memory associated with the projection may be freed with PJ-FREE."
 
   (src :pointer)
   (dst :pointer)
@@ -171,9 +171,9 @@ definition into a projPJ object suitable for use with other API
 functions. On failure the function will return NULL and set
 pj_errno. The definition should be of the general form \"+proj=tmerc
 +lon_0 +datum=WGS84\". Refer to PROJ.4 documentation and the General
-Parameters notes for additional detail.
+Parameters notes for additional details.
 
-<p>Coordinate system objects allocated with PJ-INIT-PLUS should be
+Coordinate system objects allocated with PJ-INIT-PLUS should be
 deallocated with PJ-FREE."
   (arg0 :string))
 
@@ -202,6 +202,4 @@ deallocated with PJ-FREE."
 (cffi:defcfun ("pj_release_lock" PJ-RELEASE-LOCK) :void)
 
 (cffi:defcfun ("pj_cleanup_lock" PJ-CLEANUP-LOCK) :void)
-
-
 
