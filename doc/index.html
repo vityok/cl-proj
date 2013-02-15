@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Common Lisp geographic projections API reference</title><link rel="stylesheet" type="text/css" href="index.css"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body><div id="header"><table cellspacing="0" cellpadding="0" width="100%"><tr><td valign="center">
+		  
+	      <b> Proj.4 wrapper for Lisp</b></td><td valign="center" align="right"><b>API documentation</b></td></tr></table></div><div class="main"><div id="sp-about-packages"><p><i>About cl-proj:</i><div class="indent">no documentation string found</div></p></div><h3>Other functions in cl-proj</h3><a name="cl-proj__fun__dms-to-dec"></a><div class="sp-lambda-list"><b>Function dms-to-dec</b> (deg &amp;optional (min 0.0d0) (sec 0.0d0))</div><div class="sp-definition"><div class="sp-definition-body"><div class="sph3">Details:</div><div class="indent">Converts a degree-minute-second representation to decimal
+degrees.<br><br>
+For example, to convert 47°7'50.09 to decimal representation, call
+this function with following parameters:<br><br><tt>
+  (dms-to-dec 47 7 50.9) =&gt; 47.130802</tt></div></div></div><br><a name="cl-proj__fun__parse-degrees"></a><div class="sp-lambda-list"><b>Function parse-degrees</b> (pattern str &amp;key dec)</div><div class="sp-definition"><div class="sp-definition-body"><div class="sph3">Details:</div><div class="indent">Utility function to parse lines like: 47°7'50<br><br>
+If an optional key DEC is set to true converts parsed data intodecimal representation with DMS-TO-DEC function.</div></div></div><br><a name="cl-proj__fun__pj-acquire-lock"></a><div class="sp-lambda-list"><b>Function pj-acquire-lock</b> ()</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-apply-gridshift"></a><div class="sp-lambda-list"><b>Function pj-apply-gridshift</b> (arg0 arg1 point_count point_offset x y z)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-cleanup-lock"></a><div class="sp-lambda-list"><b>Function pj-cleanup-lock</b> ()</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-compare-datums"></a><div class="sp-lambda-list"><b>Function pj-compare-datums</b> (srcdefn dstdefn)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-dalloc"></a><div class="sp-lambda-list"><b>Function pj-dalloc</b> (arg0)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-datum-transform"></a><div class="sp-lambda-list"><b>Function pj-datum-transform</b> (src dst point_count point_offset x y z)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-deallocate-grids"></a><div class="sp-lambda-list"><b>Function pj-deallocate-grids</b> ()</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-free"></a><div class="sp-lambda-list"><b>Function pj-free</b> (arg0)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-fwd"></a><div class="sp-lambda-list"><b>Function pj-fwd</b> (arg0 arg1)</div><div class="sp-definition"><div class="sp-definition-body"><div class="sph3">Details:</div><div class="indent">Forward cartographic projection.</div></div></div><br><a name="cl-proj__fun__pj-geocentric-to-geodetic"></a><div class="sp-lambda-list"><b>Function pj-geocentric-to-geodetic</b> (a es point_count point_offset x y z)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-geodetic-to-geocentric"></a><div class="sp-lambda-list"><b>Function pj-geodetic-to-geocentric</b> (a es point_count point_offset x y z)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-get-def"></a><div class="sp-lambda-list"><b>Function pj-get-def</b> (arg0 arg1)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-get-errno-ref"></a><div class="sp-lambda-list"><b>Function pj-get-errno-ref</b> ()</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-get-release"></a><div class="sp-lambda-list"><b>Function pj-get-release</b> ()</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-init"></a><div class="sp-lambda-list"><b>Function pj-init</b> (arg0 arg1)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-init-plus"></a><div class="sp-lambda-list"><b>Function pj-init-plus</b> (arg0)</div><div class="sp-definition"><div class="sp-definition-body"><div class="sph3">Details:</div><div class="indent">Convert a string representation of a coordinate system definition
+into an internal representation.<br><br>
+This function converts a string representation of a coordinate system
+definition into a projPJ object suitable for use with other API
+functions. On failure the function will return NULL and set
+pj_errno. The definition should be of the general form &quot;+proj=tmerc
++lon_0 +datum=WGS84&quot;. Refer to PROJ.4 documentation and the General
+Parameters notes for additional details.<br><br>
+Coordinate system objects allocated with PJ-INIT-PLUS should bedeallocated with PJ-FREE.</div></div></div><br><a name="cl-proj__fun__pj-inv"></a><div class="sp-lambda-list"><b>Function pj-inv</b> (arg0 arg1)</div><div class="sp-definition"><div class="sp-definition-body"><div class="sph3">Details:</div><div class="indent">Inverse cartographic projection.</div></div></div><br><a name="cl-proj__fun__pj-is-geocent"></a><div class="sp-lambda-list"><b>Function pj-is-geocent</b> (arg0)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-is-latlong"></a><div class="sp-lambda-list"><b>Function pj-is-latlong</b> (arg0)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-latlong-from-proj"></a><div class="sp-lambda-list"><b>Function pj-latlong-from-proj</b> (arg0)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-malloc"></a><div class="sp-lambda-list"><b>Function pj-malloc</b> (arg0)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-pr-list"></a><div class="sp-lambda-list"><b>Function pj-pr-list</b> (arg0)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-release-lock"></a><div class="sp-lambda-list"><b>Function pj-release-lock</b> ()</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-set-finder"></a><div class="sp-lambda-list"><b>Function pj-set-finder</b> (arg0)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-set-searchpath"></a><div class="sp-lambda-list"><b>Function pj-set-searchpath</b> (count path)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-strerrno"></a><div class="sp-lambda-list"><b>Function pj-strerrno</b> (arg0)</div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__fun__pj-transform"></a><div class="sp-lambda-list"><b>Function pj-transform</b> (src dst point_count point_offset x y z)</div><div class="sp-definition"><div class="sp-definition-body"><div class="sph3">Details:</div><div class="indent">Transform between coordinate systems.<br><br>
+The PJ-TRANSFORM function may be used to transform points between the
+two provided coordinate systems.  In addition to converting between
+cartographic projection coordinates and geographic coordinates, this
+function also takes care of datum shifts if possible between the
+source and destination coordinate system.  Unlike PJ-FWD and PJ-INV it
+is also allowable for the coordinate system definitions (PJ *) to be
+geographic coordinate systems (defined as +proj=latlong).  The x, y
+and z arrays contain the input values of the points, and are replaced
+with the output values.  The point_offset should indicate the spacing
+the of x,y,z arrays, normally 1.  The function returns zero on
+success, or the error number (also in PJ-ERRNO) on failure.<br><br>
+The z array may be passed as NULL if Z values are not available. <br><br>
+SRC: source (input) coordinate system. <br><br>
+DST: destination (output) coordinate system. <br><br>
+POINT_COUNT: the number of points to be processed (the size of the x/y/z arrays). <br><br>
+POINT_OFFSET: the step size from value to value (measured in
+doubles) within the x/y/z arrays - normally 1 for a packed array. May
+be used to operate on xyz interleaved point arrays.<br><br>
+X/Y/Z: The array of X, Y and Z coordinate values passed as input,
+and modified in place for output. The Z may optionally be NULL.<br><br>
+return: The return is zero on success, or a PROJ.4 error code.<br><br>Memory associated with the projection may be freed with PJ-FREE.</div></div></div><br><a name="cl-proj__fun__render-point"></a><div class="sp-lambda-list"><b>Function render-point</b> (ox oy extent size &amp;key (src-cs +proj=latlong +ellps=WGS84 +datum=WGS84) (dst-cs +proj=utm +zone=35 +ellps=WGS84 +datum=WGS84 +units=m +no_defs) (debug nil))</div><div class="sp-definition"><div class="sp-definition-body"><div class="sph3">Arguments:</div><ul><li><tt>extent</tt> -- specifies the geographic extents of the original surface area that is displayed within the screen with given <tt>size</tt>.<br><br><tt>extent</tt> is a plist with properties (:minx :maxx :miny :maxy) specifying geographic bounds in the source geographic system.</li><li><tt>size</tt> -- is a plist specifying (:width and :height) of the resulting image in pixels.</li><li><tt>oX</tt> -- Easting long?</li><li><tt>oY</tt> -- Northing lat?</li><li><tt>src-cs</tt> -- Proj.4 string specifying the source coordinate system</li><li><tt>dst-cs</tt> -- Proj.4 string specifying the destination coordinate system</li></ul><div class="sph3">Returns:</div><div class="indent"><br><br>
+In case of success returns multiple values:<br><br><tt>pixelX pixelY relX relY pt.x pt.y</tt><br><br>Where <tt>pixelX</tt> and <tt>pixelY</tt> are coordinates of the givenpoint in pixels within given screen; <tt>relX</tt> and <tt>relY</tt> is arelative position of the given point; <tt>pt.X</tt> and <tt>pt.Y</tt> are
+rendered coordinates of the given point.<br><br></div><div class="sph3">Details:</div><div class="indent">Renders the point with given coordinates using the Proj API and
+adjusts it to be displayed within a screen with given width and height.<br><br><br><br><br><br><br><br><br><br></div></div></div><br><h3>Other variables in cl-proj</h3><a name="cl-proj__variable__+deg-to-rad+"></a><div class="sp-lambda-list"><b>Variable +deg-to-rad+</b></div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__variable__+pj-version+"></a><div class="sp-lambda-list"><b>Variable +pj-version+</b></div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><a name="cl-proj__variable__+rad-to-deg+"></a><div class="sp-lambda-list"><b>Variable +rad-to-deg+</b></div><div class="sp-definition"><div class="sp-definition-body"><p style="color: red; font-weight: bold">
+	  No documentation string.  Possibly unimplemented or incomplete.
+	</p></div></div><br><h3><a name="index"></a>Index of exported symbols</h3><table cellspacing="0" cellpadding="0"><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__variable__+deg-to-rad+"><tt>+deg-to-rad+</tt></a>, variable <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__variable__+pj-version+"><tt>+pj-version+</tt></a>, variable <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__variable__+rad-to-deg+"><tt>+rad-to-deg+</tt></a>, variable <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__dms-to-dec"><tt>dms-to-dec</tt></a>, function</td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__parse-degrees"><tt>parse-degrees</tt></a>, function</td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-acquire-lock"><tt>pj-acquire-lock</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-apply-gridshift"><tt>pj-apply-gridshift</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-cleanup-lock"><tt>pj-cleanup-lock</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-compare-datums"><tt>pj-compare-datums</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-dalloc"><tt>pj-dalloc</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-datum-transform"><tt>pj-datum-transform</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-deallocate-grids"><tt>pj-deallocate-grids</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-free"><tt>pj-free</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-fwd"><tt>pj-fwd</tt></a>, function</td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-geocentric-to-geodetic"><tt>pj-geocentric-to-geodetic</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-geodetic-to-geocentric"><tt>pj-geodetic-to-geocentric</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-get-def"><tt>pj-get-def</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-get-errno-ref"><tt>pj-get-errno-ref</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-get-release"><tt>pj-get-release</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-init"><tt>pj-init</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-init-plus"><tt>pj-init-plus</tt></a>, function</td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-inv"><tt>pj-inv</tt></a>, function</td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-is-geocent"><tt>pj-is-geocent</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-is-latlong"><tt>pj-is-latlong</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-latlong-from-proj"><tt>pj-latlong-from-proj</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-malloc"><tt>pj-malloc</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-pr-list"><tt>pj-pr-list</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-release-lock"><tt>pj-release-lock</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-set-finder"><tt>pj-set-finder</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-set-searchpath"><tt>pj-set-searchpath</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-strerrno"><tt>pj-strerrno</tt></a>, function <span style="color: red">
+	(undocumented)
+      </span></td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__pj-transform"><tt>pj-transform</tt></a>, function</td></tr><tr><td valign="top" align="right" nowrap><span class="nonlink"><tt><span style="color: #777777">cl-proj:</span></tt></span></td><td valign="top"><a href="#cl-proj__fun__render-point"><tt>render-point</tt></a>, function</td></tr></table><div style="height: 10em"></div></div></body></html>
