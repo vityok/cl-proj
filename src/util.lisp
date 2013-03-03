@@ -1,7 +1,7 @@
 ;;; Different utility functions for more convenient usage of the
 ;;; Proj.4 library
 
-;; Copyright (c) 2012, Victor Anyakin <anyakinvictor@yahoo.com>
+;; Copyright (c) 2012, 2013 Victor Anyakin <anyakinvictor@yahoo.com>
 ;; All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
@@ -18,7 +18,7 @@
 ;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ;; ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ;; WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-;; DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+;; DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
 ;; DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 ;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 ;; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -123,6 +123,89 @@ rendered coordinates of the given point.
 		    extent.maxx extent.minx extent.maxy extent.miny)
 	    (format t "      pt.x=~a, pt.y=~a~%" pt.x pt.y)
 	    (format t "      oMap.width=~a, oMap.height=~a~%" oMap.width oMap.height))))))
+
+;;---------------------------------------------------------
+
+(defun perpendicular-distance (point line1 line2)
+  "Calculates a distance from a point to the line specified by two
+points."
+
+  (let ((x_0 (first point))
+	(y_0 (second point))
+	(x_1 (first line1))
+	(y_1 (second line1))
+	(x_2 (first line2))
+	(y_2 (second line2)))
+    (if (= x_1 x_2)			; line is vertical
+	(float (abs (- x_0 x_1)))
+	(if (= y_1 y_2)			; line is horizontal
+	    (float (abs (- y_0 y_1)))
+	    ;; general case
+	    (/ (abs (- (* (- x_2 x_1)
+			  (- y_1 y_0))
+		       (* (- x_1 x_0)
+			  (- y_2 y_1))))
+	       (sqrt (+ (expt (- x_2 x_1) 2)
+			(expt (- y_2 y_1) 2))))))))
+
+;;---------------------------------------------------------
+
+(defun simplify (points epsilon)
+  "Simplifies the given polyline using the Ramer–Douglas–Peucker
+algorithm.
+
+Given a curve composed of line segments, this function finds and
+returns a similar curve with fewer points. The algorithm defines
+'dissimilar' based on the maximum distance between the original curve
+and the simplified curve. The simplified curve consists of a subset of
+the points that defined the original curve.
+
+Check the
+@a[http://en.wikipedia.org/wiki/Ramer–Douglas–Peucker_algorithm]{Ramer–Douglas–Peucker
+algorithm} article on Wikipedia.
+
+@arg[points]{coordinates (x y) of points that specify the polyline}
+
+@arg[epsilon]{distance}
+
+@return{Given a curve composed of line segments, this function finds
+and returns a similar curve with fewer points.}
+"
+  (if (> (length points) 2)
+      (if (and (= (first (first points))
+		  (first (car (last points))))
+	       (= (second (first points))
+		  (second (car (last points)))))
+	  (concatenate 'list
+		       `(,(first points))
+		       (simplify (subseq points 1) epsilon))
+
+	  (let ((dmax 0)
+		(index 0))
+	    ;; Find the point with the maximum distance
+	    (loop for i from 1 below (- (length points) 1)
+	       for distance = (perpendicular-distance (nth i points)
+						      (first points)
+						      (car (last points)))
+	       then
+	       (perpendicular-distance (nth i points)
+				       (first points)
+				       (car (last points)))
+	       when (> distance dmax)
+	       do (setf index i
+			dmax distance))
+
+	    (if (>= dmax epsilon)
+		;; If max distance is greater than epsilon, recursively simplify
+		(let ((rec-results1 (simplify (subseq points 0 index) epsilon))
+		      (rec-results2 (simplify (subseq points index)   epsilon)))
+		  (concatenate 'list rec-results1 rec-results2))
+
+		`(,(first points) ,(car (last points))))))
+      ;; there are only two points nothing to simplify
+      points))
+
+
 
 ;;---------------------------------------------------------
 

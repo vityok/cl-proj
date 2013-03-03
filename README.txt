@@ -1,5 +1,5 @@
-CL-PROJ provides bindings for the Proj.4 library
-================================================
+CL-PROJ: Lisp bindings for the Proj.4 library
+=============================================
 
 PROJ.4 is a cartographic projections library originally written by
 Gerald Evenden then of the USGS. PROJ.4 has been placed under an MIT
