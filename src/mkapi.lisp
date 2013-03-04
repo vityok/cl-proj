@@ -34,6 +34,7 @@
 
 (ql:quickload "atdoc")
 (ql:quickload "cl-proj")
+(ql:quickload "cl-markdown")
 
 (atdoc:generate-html-documentation
  '(:cl-proj)
