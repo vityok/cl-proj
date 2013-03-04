@@ -29,6 +29,14 @@
 (defpackage :cl-proj
   (:use :cl)
   (:nicknames :pj)
+  
+  (:documentation "CL-PROJ provides bindings for the Proj.4 library.
+
+Constants, variables and function names are extremely close to the
+native PROJ.4 library.
+
+A number of utility functions are provided along with bare bindings.")
+  
   (:export 
    :+PJ-VERSION+
    :PJ-RELEASE

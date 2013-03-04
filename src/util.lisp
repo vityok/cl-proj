@@ -36,8 +36,8 @@
 		     (dst-cs "+proj=utm +zone=35 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 		     (debug nil))
   
-  "Renders the point with given coordinates using the Proj API and
-adjusts it to be displayed within a screen with given width and height.
+  "@short{Renders the point with given coordinates using the Proj API and
+ adjusts it to be displayed within a screen with given width and height.}
 
 @arg[extent]{specifies the geographic extents of the original surface
  area that is displayed within the screen with given @code{size}.
@@ -127,8 +127,8 @@ rendered coordinates of the given point.
 ;;---------------------------------------------------------
 
 (defun perpendicular-distance (point line1 line2)
-  "Calculates a distance from a point to the line specified by two
-points."
+  "@short{Calculates a distance from a point to the line specified by two
+ points.}"
 
   (let ((x_0 (first point))
 	(y_0 (second point))
@@ -151,8 +151,8 @@ points."
 ;;---------------------------------------------------------
 
 (defun simplify (points epsilon)
-  "Simplifies the given polyline using the Ramer–Douglas–Peucker
-algorithm.
+  "@short{Simplifies the given polyline using the Ramer–Douglas–Peucker
+ algorithm.}
 
 Given a curve composed of line segments, this function finds and
 returns a similar curve with fewer points. The algorithm defines
@@ -161,15 +161,15 @@ and the simplified curve. The simplified curve consists of a subset of
 the points that defined the original curve.
 
 Check the
-@a[http://en.wikipedia.org/wiki/Ramer–Douglas–Peucker_algorithm]{Ramer–Douglas–Peucker
-algorithm} article on Wikipedia.
+ @a[http://en.wikipedia.org/wiki/Ramer–Douglas–Peucker_algorithm]{Ramer–Douglas–Peucker
+ algorithm} article on Wikipedia.
 
 @arg[points]{coordinates (x y) of points that specify the polyline}
 
 @arg[epsilon]{distance}
 
 @return{Given a curve composed of line segments, this function finds
-and returns a similar curve with fewer points.}
+ and returns a similar curve with fewer points.}
 "
   (if (> (length points) 2)
       (if (and (= (first (first points))
@@ -245,8 +245,8 @@ Program sources can be found at:
 ;;---------------------------------------------------------
 
 (defun dms-to-dec (deg &optional (min 0d0) (sec 0d0))
-  "Converts a degree-minute-second representation to decimal
-degrees.
+  "@short{Converts a degree-minute-second representation to decimal
+ degrees.}
 
 For example, to convert 47°7'50.09 to decimal representation, call
 this function with following parameters:
