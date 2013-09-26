@@ -43,7 +43,8 @@ A number of utility functions are provided along with bare bindings.")
    :+RAD-TO-DEG+
    :+DEG-TO-RAD+
    :PJ-ERRNO
-   :projUV
+   :PROJ-UV
+   :PROJ-PJ
    :PJ-FWD
    :PJ-INV
    :PJ-TRANSFORM
