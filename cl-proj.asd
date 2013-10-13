@@ -42,4 +42,4 @@
 			  :components ((:file "package")
 				       (:file "cl-proj" :depends-on ("package"))
 				       (:file "util" :depends-on ("cl-proj")))))
-    :depends-on (:cffi))
+    :depends-on (:cffi :parse-number))

@@ -70,35 +70,35 @@
 (cffi:defcfun ("pj_transform" %PJ-TRANSFORM) :int
   "@short{Transform between coordinate systems.}
 
-The %PJ-TRANSFORM function may be used to transform points between the
-two provided coordinate systems.  In addition to converting between
-cartographic projection coordinates and geographic coordinates, this
-function also takes care of datum shifts if possible between the
-source and destination coordinate system.  Unlike @fun{PJ-FWD} and
-@fun{PJ-INV} it is also allowable for the coordinate system
-definitions (PJ *) to be geographic coordinate systems (defined as
-+proj=latlong).  The x, y and z arrays contain the input values of the
-points, and are replaced with the output values.  The point_offset
-should indicate the spacing the of x,y,z arrays, normally 1.  The
-function returns zero on success, or the error number (also in
-@variable{pj-errno}) on failure.
+ The %PJ-TRANSFORM function may be used to transform points between the
+ two provided coordinate systems.  In addition to converting between
+ cartographic projection coordinates and geographic coordinates, this
+ function also takes care of datum shifts if possible between the
+ source and destination coordinate system.  Unlike @fun{PJ-FWD} and
+ @fun{PJ-INV} it is also allowable for the coordinate system
+ definitions (PJ *) to be geographic coordinate systems (defined as
+ +proj=latlong).  The x, y and z arrays contain the input values of the
+ points, and are replaced with the output values.  The point_offset
+ should indicate the spacing the of x,y,z arrays, normally 1.  The
+ function returns zero on success, or the error number (also in
+ @variable{pj-errno}) on failure.
 
-The z array may be passed as NULL if Z values are not available.
+ The z array may be passed as NULL if Z values are not available.
 
-@arg[src]{source (input) coordinate system.}
+ @arg[src]{source (input) coordinate system.}
 
-@arg[dst]{destination (output) coordinate system.}
+ @arg[dst]{destination (output) coordinate system.}
 
-@arg[point_count]{the number of points to be processed (the size of the x/y/z arrays).}
+ @arg[point_count]{the number of points to be processed (the size of the x/y/z arrays).}
 
-@arg[point_offset]{the step size from value to value (measured in
+ @arg[point_offset]{the step size from value to value (measured in
  doubles) within the x/y/z arrays - normally 1 for a packed array. May
  be used to operate on xyz interleaved point arrays.}
 
-X/Y/Z: The array of X, Y and Z coordinate values passed as input,
-and modified in place for output. The Z may optionally be NULL.
+ X/Y/Z: The array of X, Y and Z coordinate values passed as input,
+ and modified in place for output. The Z may optionally be NULL.
 
-@return{The return is zero on success, or a PROJ.4 error code.}
+ @return{The return is zero on success, or a PROJ.4 error code.}
 
 Memory associated with the projection may be freed with @fun{pj-free}."
   (src proj-pj)
@@ -135,9 +135,9 @@ Memory associated with the projection may be freed with @fun{pj-free}."
 
  Memory associated with the projection may be freed with @fun{pj-free}."
   (let ((len (length points)))
-    (with-foreign-objects ((x :double len)
-			   (y :double len)
-			   (z :double len))
+    (cffi:with-foreign-objects ((x :double len)
+				(y :double len)
+				(z :double len))
       (dotimes (i len)
 	(setf (cffi:mem-aref x :double i) (first (nth i points))
 	      (cffi:mem-aref y :double i) (second (nth i points))

@@ -35,7 +35,7 @@
 		     (src-cs "+proj=latlong +ellps=WGS84 +datum=WGS84")
 		     (dst-cs "+proj=utm +zone=35 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 		     (debug nil))
-  
+
   "@short{Renders the point with given coordinates using the Proj API and
  adjusts it to be displayed within a screen with given width and height.}
 
@@ -263,33 +263,50 @@ this function with following parameters:
 
 ;;---------------------------------------------------------
 
-(defun parse-degrees (pattern str &key dec)
-  "Utility function to parse lines like: 47°7'50
+(defun parse-degrees (pattern str &key dec (start 0))
+  "@short{Utility function to parse string representation of angles
+ like: 47°7'50}
 
-If an optional key DEC is set to true converts parsed data into
-decimal representation with DMS-TO-DEC function."
-  
-  (let ((offset 0)
-	(degs)
-	(mins)
-	(secs))
+ PATTERN is a list that consists of strings and keywords: where :D
+ stands for degrees, :M for minutes and :S for seconds.
+
+ For instance, next command parses 47°7'50.09:
+
+@begin{code}
+ (parse-degrees '(:d \"°\" :m \"'\" :s ) \"47°7'50.09\") => 47 7 50.09
+@end{code}
+
+ If an optional key DEC is set to True, returns decimal representation
+ of the parsed angle."
+  (let ((offset start)
+	(degs 0d0)
+	(mins 0d0)
+	(secs 0d0))
     (dolist (pat pattern)
       (if (stringp pat)
 	  (setf offset (+ offset (length pat)))
 	  (case pat
+	    ;; degrees
 	    (:d (multiple-value-bind (digit chars)
 		    (parse-integer str :start offset :junk-allowed T)
 		  (setf degs digit)
 		  (setf offset chars)))
+	    ;; minutes
 	    (:m (multiple-value-bind (digit chars)
 		    (parse-integer str :start offset :junk-allowed T)
 		  (setf mins digit)
 		  (setf offset chars)))
-	    (:s (multiple-value-bind (digit chars)
-		    (parse-integer str :start offset :junk-allowed T)
-		  (setf secs digit)
-		  (setf offset chars)))
-	    (otherwise (error "unknown pattern")))))
+	    ;; seconds
+	    (:s (let ((end offset))
+		  (loop for i from offset below (length str)
+		       while (or (digit-char-p (char str i))
+				 (char= #\. (char str i)))
+		       do (incf end))
+		  (multiple-value-bind (digit chars)
+		      (parse-number:parse-number str :start offset :end end)
+		    (setf secs digit)
+		    (setf offset chars))))
+	    (otherwise (error "unknown pattern: ~a" pat)))))
     (if dec
 	(dms-to-dec degs mins secs)
 	(values degs mins secs))))
