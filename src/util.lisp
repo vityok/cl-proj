@@ -299,17 +299,22 @@ this function with following parameters:
 	    ;; seconds
 	    (:s (let ((end offset))
 		  (loop for i from offset below (length str)
-		       while (or (digit-char-p (char str i))
-				 (char= #\. (char str i)))
-		       do (incf end))
-		  (multiple-value-bind (digit chars)
+                     while (or (digit-char-p (char str i))
+                               (char= #\. (char str i)))
+                     do (incf end))
+		  (multiple-value-bind (digit)
 		      (parse-number:parse-number str :start offset :end end)
 		    (setf secs digit)
-		    (setf offset chars))))
+		    (setf offset end))))
+            ;; any non-numeric characters are skipped
+            (:any-chars
+             (loop while (and (not (digit-char-p (char str offset)))
+                              (< offset (length str)))
+                do (incf offset)))
 	    (otherwise (error "unknown pattern: ~a" pat)))))
     (if dec
-	(dms-to-dec degs mins secs)
-	(values degs mins secs))))
+	(values (dms-to-dec degs mins secs) offset)
+	(values degs mins secs offset))))
 
 ;; (parse-degrees '(:d "°" :m "'" :s ) "47°7'50.09") => 47 7 50.09
 
