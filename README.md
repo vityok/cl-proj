@@ -20,7 +20,7 @@ site](https://bitbucket.org/vityok/cl-proj).
 
 Released files can be downloaded from [the downloads
 page](http://sourceforge.net/projects/cl-proj/files). And it can also
-be installed using the `[Quicklisp](https://www.quicklisp.org/)` system.
+be installed using the [Quicklisp](https://www.quicklisp.org/) system.
 
 
 Usage
