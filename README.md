@@ -9,43 +9,38 @@ CL-PROJ provides CFFI-based Common Lisp bindings for the PROJ.4
 library. It is placed under the Berkeley Software Distribution (BSD)
 license meaning that you can do almost everything you want with it.
 
-PROJ.4 homepage is: [http://trac.osgeo.org/proj/](http://trac.osgeo.org/proj/)
+PROJ.4 homepage is: [trac.osgeo.org/proj](http://trac.osgeo.org/proj/)
 
-CL-PROJ homepage is:
-[http://cl-proj.sourceforge.net/](http://cl-proj.sourceforge.net/) and
-the project page is:
-[http://sourceforge.net/projects/cl-proj/](http://sourceforge.net/projects/cl-proj/)
+Original CL-PROJ homepage is:
+[cl-proj.sourceforge.net](http://cl-proj.sourceforge.net/) and the
+project page is:
+[sourceforge.net/projects/cl-proj](http://sourceforge.net/projects/cl-proj/). However,
+project development is moving to [a new
+site](https://bitbucket.org/vityok/cl-proj).
 
 Released files can be downloaded from [the downloads
 page](http://sourceforge.net/projects/cl-proj/files). And it can also
-be installed using the `asdf-install` program.
-
+be installed using the `[Quicklisp](https://www.quicklisp.org/)` system.
 
 
 Usage
 =====
 
-Typical library loading and linking into the Lisp image would be:
-
-    (require 'cffi)
-    (cffi:define-foreign-library libproj (t (:default "libproj")))
-    (cffi:load-foreign-library 'libproj)
-    (require 'cl-proj)
+Library loading and linking into the Lisp image is performed
+automatically when it is loaded by ASDF/QuickLisp.
 
 Symbols are defined in the `cl-proj` package and are also available
 using the `pj` package nickname.
-
-By now the native libproj shared library should be loaded and linked
-into the Lisp image and all the bindings should be resolved.
 
 Constants, variables and functions are extremely close to the
 PROJ.4. API is documented in the <api.html> file that is supplied in
 the distribution.
 
+
 Copying
 =======
 
-    Copyright (c) 2012, Victor Anyakin <anyakinvictor@yahoo.com>
+    Copyright (c) 2012,2015, Victor Anyakin <anyakinvictor@yahoo.com>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without

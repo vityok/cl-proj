@@ -1,6 +1,6 @@
 ;;;
 
-;; Copyright (c) 2012, Victor Anyakin <anyakinvictor@yahoo.com>
+;; Copyright (c) 2015, Victor Anyakin <anyakinvictor@yahoo.com>
 ;; All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
@@ -25,19 +25,27 @@
 ;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ;; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+(in-package :cl-user)
+
+(cffi:define-foreign-library libproj
+    (:unix (:or "libproj.so" "libproj.so.0"))
+  (t (:default "libproj")))
+(cffi:use-foreign-library libproj)
+
+;; --------------------------------------------------------
 
 (defpackage :cl-proj
   (:use :cl)
   (:nicknames :pj)
-  
+
   (:documentation "CL-PROJ provides bindings for the Proj.4 library.
 
 Constants, variables and function names are extremely close to the
 native PROJ.4 library.
 
 A number of utility functions are provided along with bare bindings.")
-  
-  (:export 
+
+  (:export
    :+PJ-VERSION+
    :PJ-RELEASE
    :+RAD-TO-DEG+
@@ -80,4 +88,4 @@ A number of utility functions are provided along with bare bindings.")
    :SIMPLIFY
    :PERPENDICULAR-DISTANCE))
 
-
+;; EOF
