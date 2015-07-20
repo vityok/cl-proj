@@ -1,8 +1,8 @@
 ;;; Different utility functions for more convenient usage of the
 ;;; Proj.4 library
 
-;; Copyright (c) 2012, 2013 Victor Anyakin <anyakinvictor@yahoo.com>
-;; All rights reserved.
+;; Copyright (c) 2012, 2013, 2015 Victor Anyakin
+;; <anyakinvictor@yahoo.com> All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions are met:
@@ -28,6 +28,57 @@
 
 
 (in-package :cl-proj)
+
+;;---------------------------------------------------------
+
+(defun geo-transform (src dst points &key (degs nil))
+  "@short{Transform between coordinate systems.}
+
+ The GEO-TRANSFORM function may be used to transform points between
+ the two provided coordinate systems.  In addition to converting
+ between cartographic projection coordinates and geographic
+ coordinates, this function also takes care of datum shifts if
+ possible between the source and destination coordinate system.
+ Unlike @fun{PJ-FWD} and @fun{PJ-INV} it is also allowable for the
+ coordinate system definitions (PJ *) to be geographic coordinate
+ systems (defined as +proj=latlong).  The x, y and z arrays contain
+ the input values of the points, and are replaced with the output
+ values.  The point_offset should indicate the spacing the of x,y,z
+ arrays, normally 1.  The function returns zero on success, or the
+ error number (also in @variable{pj-errno}) on failure.
+
+ The z array may be passed as NULL if Z values are not available.
+
+ @arg[src]{source (input) coordinate system.}
+ @arg[dst]{destination (output) coordinate system.}
+ @arg[points]{A list of X, Y and Z coordinate triple values.}
+ @arg[digs]{Set this T if source coordinates are degrees.}
+
+ @return{The return is zero on success, or a PROJ.4 error code.}
+
+ Memory associated with the projection may be freed with @fun{pj-free}."
+
+  (let ((len (length points)))
+    (cffi:with-foreign-objects ((x :double len)
+				(y :double len)
+				(z :double len))
+      (if degs
+	  (dotimes (i len)
+	    (setf (cffi:mem-aref x :double i) (* (first (nth i points)) +DEG-TO-RAD+)
+		  (cffi:mem-aref y :double i) (* (second (nth i points)) +DEG-TO-RAD+)
+		  (cffi:mem-aref z :double i) (* (third (nth i points)) +DEG-TO-RAD+)))
+	  (dotimes (i len)
+	    (setf (cffi:mem-aref x :double i) (first (nth i points))
+		  (cffi:mem-aref y :double i) (second (nth i points))
+		  (cffi:mem-aref z :double i) (third (nth i points)))))
+
+      (pj-transform src dst len 0 x y z)
+
+      (loop :for i :from 0 :below len
+	 :collect (list (cffi:mem-aref x :double i)
+			(cffi:mem-aref y :double i)
+			(cffi:mem-aref z :double i))))))
+(export 'geo-transform)
 
 ;;---------------------------------------------------------
 
