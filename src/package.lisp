@@ -56,6 +56,7 @@ A number of utility functions are provided along with bare bindings.")
    :PJ-FWD
    :PJ-INV
    :PJ-TRANSFORM
+   :PJ-TRANSFORM-NATIVE
    :PJ-DATUM-TRANSFORM
    :PJ-GEOCENTRIC-TO-GEODETIC
    :PJ-GEODETIC-TO-GEOCENTRIC
