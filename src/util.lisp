@@ -72,11 +72,15 @@ rendered coordinates of the given point.
 	 (o.x (cffi:foreign-alloc :double :count 3))
 	 (o.y (cffi:foreign-alloc :double :count 3)))
 
-    (setf (cffi:mem-aref o.x :double 0) (* (float ox 0.0d0) +DEG-TO-RAD+))
-    (setf (cffi:mem-aref o.y :double 0) (* (float oy 0.0d0) +DEG-TO-RAD+))
+    (setf (cffi:mem-aref o.x :double 0)
+	  (* (float ox 0.0d0) +DEG-TO-RAD+)
+	  (cffi:mem-aref o.y :double 0)
+	  (* (float oy 0.0d0) +DEG-TO-RAD+))
 
-    (setf (cffi:mem-aref o.x :double 1) (* (float (getf extent :minx) 0.0d0) +DEG-TO-RAD+))
-    (setf (cffi:mem-aref o.y :double 1) (* (float (getf extent :miny) 0.0d0) +DEG-TO-RAD+))
+    (setf (cffi:mem-aref o.x :double 1)
+	  (* (float (getf extent :minx) 0.0d0) +DEG-TO-RAD+)
+	  (cffi:mem-aref o.y :double 1)
+	  (* (float (getf extent :miny) 0.0d0) +DEG-TO-RAD+))
 
     (setf (cffi:mem-aref o.x :double 2) (* (float (getf extent :maxx) 0.0d0) +DEG-TO-RAD+))
     (setf (cffi:mem-aref o.y :double 2) (* (float (getf extent :maxy) 0.0d0) +DEG-TO-RAD+))

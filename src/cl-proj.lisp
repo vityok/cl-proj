@@ -109,7 +109,9 @@ Memory associated with the projection may be freed with @fun{pj-free}."
   (y (:pointer :double))
   (z (:pointer :double)))
 
-(defun pj-transform (src dst points)
+;; --------------------------------------------------------
+
+(defun pj-transform (src dst points &key (degs nil))
   "@short{Transform between coordinate systems.}
 
  The PJ-TRANSFORM function may be used to transform points between the
@@ -130,6 +132,7 @@ Memory associated with the projection may be freed with @fun{pj-free}."
  @arg[src]{source (input) coordinate system.}
  @arg[dst]{destination (output) coordinate system.}
  @arg[points]{A list of X, Y and Z coordinate triple values.}
+ @arg[digs]{Set this T if source coordinates are degrees.}
 
  @return{The return is zero on success, or a PROJ.4 error code.}
 
@@ -138,16 +141,22 @@ Memory associated with the projection may be freed with @fun{pj-free}."
     (cffi:with-foreign-objects ((x :double len)
 				(y :double len)
 				(z :double len))
-      (dotimes (i len)
-	(setf (cffi:mem-aref x :double i) (first (nth i points))
-	      (cffi:mem-aref y :double i) (second (nth i points))
-	      (cffi:mem-aref z :double i) (third (nth i points)))
-	(pj-transform-native src dst len 0 x y z)
+      (if degs
+	  (dotimes (i len)
+	    (setf (cffi:mem-aref x :double i) (* (first (nth i points)) +DEG-TO-RAD+)
+		  (cffi:mem-aref y :double i) (* (second (nth i points)) +DEG-TO-RAD+)
+		  (cffi:mem-aref z :double i) (* (third (nth i points)) +DEG-TO-RAD+)))
+	  (dotimes (i len)
+	    (setf (cffi:mem-aref x :double i) (first (nth i points))
+		  (cffi:mem-aref y :double i) (second (nth i points))
+		  (cffi:mem-aref z :double i) (third (nth i points)))))
 
-	(loop :for i :from 0 :below len
-	   :collect (list (cffi:mem-aref x :double i) (first (nth i points))
-			  (cffi:mem-aref y :double i) (second (nth i points))
-			  (cffi:mem-aref z :double i) (third (nth i points))))))))
+      (pj-transform-native src dst len 0 x y z)
+
+      (loop :for i :from 0 :below len
+	 :collect (list (cffi:mem-aref x :double i)
+			(cffi:mem-aref y :double i)
+			(cffi:mem-aref z :double i))))))
 
 ;; --------------------------------------------------------
 
