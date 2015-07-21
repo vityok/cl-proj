@@ -31,6 +31,21 @@
 
 ;;---------------------------------------------------------
 
+(defmacro deg-to-rad (val)
+  "Convert given value from degrees to radians."
+  `(* ,val +DEG-TO-RAD+))
+
+;;---------------------------------------------------------
+
+(defun deg-to-rad-array (x len)
+  "Converts numbers in the given native array of length LEN from
+degrees to radians and stores them in the same array."
+  (dotimes (i len)
+    (setf (cffi:mem-aref x :double i)
+          (deg-to-rad (cffi:mem-aref x :double i)))))
+
+;;---------------------------------------------------------
+
 (defun geo-transform (src dst points &key (degs nil))
   "@short{Transform between coordinate systems.}
 
@@ -64,9 +79,9 @@
 				(z :double len))
       (if degs
 	  (dotimes (i len)
-	    (setf (cffi:mem-aref x :double i) (* (first (nth i points)) +DEG-TO-RAD+)
-		  (cffi:mem-aref y :double i) (* (second (nth i points)) +DEG-TO-RAD+)
-		  (cffi:mem-aref z :double i) (* (third (nth i points)) +DEG-TO-RAD+)))
+	    (setf (cffi:mem-aref x :double i) (deg-to-rad (first (nth i points)))
+		  (cffi:mem-aref y :double i) (deg-to-rad (second (nth i points)))
+		  (cffi:mem-aref z :double i) (deg-to-rad (third (nth i points)))))
 	  (dotimes (i len)
 	    (setf (cffi:mem-aref x :double i) (first (nth i points))
 		  (cffi:mem-aref y :double i) (second (nth i points))
@@ -124,17 +139,17 @@ rendered coordinates of the given point.
 	 (o.y (cffi:foreign-alloc :double :count 3)))
 
     (setf (cffi:mem-aref o.x :double 0)
-	  (* (float ox 0.0d0) +DEG-TO-RAD+)
+	  (deg-to-rad (float ox 0.0d0))
 	  (cffi:mem-aref o.y :double 0)
-	  (* (float oy 0.0d0) +DEG-TO-RAD+))
+	  (deg-to-rad (float oy 0.0d0)))
 
     (setf (cffi:mem-aref o.x :double 1)
-	  (* (float (getf extent :minx) 0.0d0) +DEG-TO-RAD+)
+	  (deg-to-rad (float (getf extent :minx) 0.0d0))
 	  (cffi:mem-aref o.y :double 1)
-	  (* (float (getf extent :miny) 0.0d0) +DEG-TO-RAD+))
+	  (deg-to-rad (float (getf extent :miny) 0.0d0)))
 
-    (setf (cffi:mem-aref o.x :double 2) (* (float (getf extent :maxx) 0.0d0) +DEG-TO-RAD+))
-    (setf (cffi:mem-aref o.y :double 2) (* (float (getf extent :maxy) 0.0d0) +DEG-TO-RAD+))
+    (setf (cffi:mem-aref o.x :double 2) (deg-to-rad (float (getf extent :maxx) 0.0d0)))
+    (setf (cffi:mem-aref o.y :double 2) (deg-to-rad (float (getf extent :maxy) 0.0d0)))
 
     (pj-transform wgsProj mapProj 3 1 o.x o.y (cffi:null-pointer))
     (pj-free wgsProj)
@@ -284,9 +299,9 @@ Program sources can be found at:
 	(p.y (cffi:foreign-alloc :double)))
 
     (setf (cffi:mem-ref p.x :double)
-	  (* (float (read) 0.0d0) +DEG-TO-RAD+))
+	  (deg-to-rad (float (read) 0.0d0)))
     (setf (cffi:mem-ref p.y :double)
-	  (* (float (read) 0.0d0) +DEG-TO-RAD+))
+	  (deg-to-rad (float (read) 0.0d0)))
 
     (pj-transform pj-latlong pj-merc 1 1 p.x p.y (cffi:null-pointer))
 

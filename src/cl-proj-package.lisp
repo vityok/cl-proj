@@ -81,6 +81,8 @@ A number of utility functions are provided along with bare bindings.")
    :pj-release-lock
    :pj-cleanup-lock
    ;; utils
+   :deg-to-rad
+   :deg-to-rad-array
    :geo-transform
    :render-point
    :load-defaults
