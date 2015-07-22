@@ -114,8 +114,8 @@ Memory associated with the projection may be freed with @fun{pj-free}."
 (cffi:defcfun ("pj_datum_transform" PJ-DATUM-TRANSFORM) :int
   (src proj-pj)
   (dst proj-pj)
-  (point_count :long)
-  (point_offset :int)
+  (point-count :long)
+  (point-offset :int)
   (x (:pointer :double))
   (y (:pointer :double))
   (z (:pointer :double)))
@@ -125,8 +125,8 @@ Memory associated with the projection may be freed with @fun{pj-free}."
 (cffi:defcfun ("pj_geocentric_to_geodetic" PJ-GEOCENTRIC-TO-GEODETIC) :int
   (a :double)
   (es :double)
-  (point_count :long)
-  (point_offset :int)
+  (point-count :long)
+  (point-offset :int)
   (x (:pointer :double))
   (y (:pointer :double))
   (z (:pointer :double)))

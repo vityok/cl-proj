@@ -87,7 +87,7 @@ degrees to radians and stores them in the same array."
 		  (cffi:mem-aref y :double i) (second (nth i points))
 		  (cffi:mem-aref z :double i) (third (nth i points)))))
 
-      (pj-transform src dst len 0 x y z)
+      (pj-transform src dst len 1 x y z)
 
       (loop :for i :from 0 :below len
 	 :collect (list (cffi:mem-aref x :double i)
@@ -138,15 +138,11 @@ rendered coordinates of the given point.
 	 (o.x (cffi:foreign-alloc :double :count 3))
 	 (o.y (cffi:foreign-alloc :double :count 3)))
 
-    (setf (cffi:mem-aref o.x :double 0)
-	  (deg-to-rad (float ox 0.0d0))
-	  (cffi:mem-aref o.y :double 0)
-	  (deg-to-rad (float oy 0.0d0)))
+    (setf (cffi:mem-aref o.x :double 0) (deg-to-rad (float ox 0.0d0))
+	  (cffi:mem-aref o.y :double 0) (deg-to-rad (float oy 0.0d0)))
 
-    (setf (cffi:mem-aref o.x :double 1)
-	  (deg-to-rad (float (getf extent :minx) 0.0d0))
-	  (cffi:mem-aref o.y :double 1)
-	  (deg-to-rad (float (getf extent :miny) 0.0d0)))
+    (setf (cffi:mem-aref o.x :double 1) (deg-to-rad (float (getf extent :minx) 0.0d0))
+	  (cffi:mem-aref o.y :double 1) (deg-to-rad (float (getf extent :miny) 0.0d0)))
 
     (setf (cffi:mem-aref o.x :double 2) (deg-to-rad (float (getf extent :maxx) 0.0d0)))
     (setf (cffi:mem-aref o.y :double 2) (deg-to-rad (float (getf extent :maxy) 0.0d0)))
