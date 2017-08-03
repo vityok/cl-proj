@@ -28,7 +28,7 @@
 (in-package :cl-user)
 
 (cffi:define-foreign-library libproj
-    (:unix (:or "libproj.so" "libproj.so.0"))
+    (:unix (:or "libproj.so" "libproj.so.0" "libproj.so.9"))
   (t (:default "libproj")))
 (cffi:use-foreign-library libproj)
 
