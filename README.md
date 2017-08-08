@@ -36,6 +36,9 @@ Constants, variables and functions are extremely close to the
 PROJ.4. API is documented in the <api.html> file that is supplied in
 the distribution.
 
+Primary development platform is recent Ubuntu Linux distribution with
+recent versions of SBCL and ECL Common Lisps.
+
 
 Copying
 =======

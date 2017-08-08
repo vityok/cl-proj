@@ -1,6 +1,6 @@
 ;;;
 
-;; Copyright (c) 2015, Victor Anyakin <anyakinvictor@yahoo.com>
+;; Copyright (c) 2015, 2017 Victor Anyakin <anyakinvictor@yahoo.com>
 ;; All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
@@ -34,18 +34,31 @@
 
 ;; --------------------------------------------------------
 
-(defpackage :cl-proj
-  (:use :cl)
-  (:nicknames :pj)
+(defpackage :geodesic-types
+  (:use #:cl #:cffi)
+  (:documentation "Geodesic types produced by groveling the geodesic.h
+  header file.")
+  (:export :+geodesic-version-major+ :+geodesic-version-minor+
+           :+geodesic-version-patch+ :+geodesic-version+
+           :geod-geodesic :geod-geodesicline :geod-polygon
+           :geod-mask :geod-flags))
 
+;; --------------------------------------------------------
+
+(defpackage :cl-proj
+  (:use :cl #:geodesic-types)
+  (:nicknames :pj)
   (:documentation "CL-PROJ provides bindings for the Proj.4 library.
 
 Constants, variables and function names are extremely close to the
 native PROJ.4 library.
 
-A number of utility functions are provided along with bare bindings.")
+A number of utility functions are provided along with bare bindings.
+
+Bindings for the geodesic API are also implemented.")
 
   (:export
+   ;; proj_api.h
    :+pj-version+
    :pj-release
    :+rad-to-deg+

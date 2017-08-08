@@ -32,17 +32,21 @@
 
 (in-package :cl-proj-asd)
 
+(cl:eval-when (:load-toplevel :execute)
+  (asdf:load-system :cffi-grovel))
 
 (asdf:defsystem :cl-proj
   :description "CL-PROJ provides Proj.4 library bindings"
-  :version "4.7.1"
+  :version "4.9.2"
   :author "Victor Anyakin <anyakinvictor@yahoo.com>"
   :licence "BSD"
   :components
   ((:module "src"
 	    :serial t
-	    :components ((:file "cl-proj-package")
-			 (:file "cl-proj")
+	    :components ((:file "package")
+                         (cffi-grovel:grovel-file "grovel-geodesic")
+			 (:file "proj-api")
+                         (:file "geodesic")
 			 (:file "util"))))
   :depends-on (:cffi
 	       :parse-number))
