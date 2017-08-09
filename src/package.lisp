@@ -36,6 +36,7 @@
 
 (defpackage :geodesic-types
   (:use #:cl #:cffi)
+  (:nicknames :geo-types)
   (:documentation "Geodesic types produced by groveling the geodesic.h
   header file.")
   (:export :+geodesic-version-major+ :+geodesic-version-minor+

@@ -1,7 +1,5 @@
 ;;; geodesic.h
 
-;;; Bindings for the geodesic routines in the geodesic.h file in C
-
 ;; Copyright (c) 2017 Victor Anyakin <anyakinvictor@yahoo.com>
 ;; All rights reserved.
 
@@ -27,10 +25,19 @@
 ;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ;; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+;;; Bindings for the geodesic routines from the geodesic.h file.
+;;; First part of the file are plain CFFI declarations. Second part
+;;; defines higher-level wrappers that make working with the lower
+;;; level C functions more Lispy and convenient
+
 (in-package :cl-proj)
 
 ;; --------------------------------------------------------
 
+;; recommended values to use with GEOD-INIT
+(defconstant +equatorial-radius+ 6378137d0)
+(defconstant +flattening+ (float (/ 1 298.257223563) 0.0d0))
+(export '(+equatorial-radius+ +flattening+))
 
 ;; --------------------------------------------------------
 
@@ -40,7 +47,7 @@
 @param[out] g a pointer to the object to be initialized.
 @param[in] a the equatorial radius (meters).
 @param[in] f the flattening."
-  (g (:pointer geod-geodesic))
+  (g (:pointer (:struct geod-geodesic)))
   (a :double)
   (f :double))
 
@@ -82,8 +89,8 @@ A value of \e caps = 0 is treated as GEOD_LATITUDE | GEOD_LONGITUDE |
 GEOD_AZIMUTH | GEOD_DISTANCE_IN (to support the solution of the 'standard'
 direct problem).
 "
-  (l (:pointer geod-geodesicline))
-  (g (:pointer geod-geodesic))
+  (l (:pointer (:struct geod-geodesicline)))
+  (g (:pointer (:struct geod-geodesic)))
   (lat1 :double)
   (lon1 :double)
   (azi1 :double)
@@ -340,7 +347,7 @@ some quantities computed.
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun  ("geod_genposition" geod-genposition) :double
+(cffi:defcfun  ("geod_genposition" GEOD-GENPOSITION) :double
   "The general position function.
 
 @param[in] l a pointer to the geod_geodesicline object specifying the
@@ -443,7 +450,7 @@ geod_polygon_compute().
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("geod_polygon_addpoint" geod-polygon-addpoint) :void
+(cffi:defcfun ("geod_polygon_addpoint" GEOD-POLYGON-ADDPOINT) :void
   "Add a point to the polygon or polyline.
 
 @param[in] g a pointer to the geod_geodesic object specifying the
@@ -539,7 +546,7 @@ printf(\"%d %.8f %.3f\n\", n, P, A);
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("geod_polygon_testpoint" geod-polygon-testpoint) :unsigned-int
+(cffi:defcfun ("geod_polygon_testpoint" GEOD-POLYGON-TESTPOINT) :unsigned-int
   "Return the results assuming a tentative final test point is added;
 however, the data for the test point is not saved.  This lets you report a
 running result for the perimeter and area as the user moves the mouse
@@ -649,5 +656,82 @@ printf(\"%.0f %.2f\n\", A, P);
   (n :int)
   (pa :pointer :double)
   (pp :pointer :double))
+
+;; --------------------------------------------------------
+(export '(geod-init))
+
+;; --------------------------------------------------------
+;; HIGH LEVEL WRAPPERS
+;; --------------------------------------------------------
+
+(defclass geo-object ()
+  ((pointer
+    :type (or null cffi:foreign-pointer)
+    :initarg :pointer
+    :accessor pointer
+    :initform nil)))
+
+;;---------------------------------------------------------
+
+(defclass geodesic (geo-object) ())
+
+;;---------------------------------------------------------
+
+(defun make-geodesic (&key (a +equatorial-radius+) (f +flattening+))
+  ;; todo: let trivial-garbage handle memory cleanup
+  (let ((g (make-instance 'geodesic)))
+    (setf (pointer g) (cffi:foreign-alloc '(:struct geod-geodesic)))
+    (format t "TEST: allocated, init-ing (~a, ~a)~%"
+            a f)
+    ;; for whatever reason geod_init raises division by zero error
+    ;; (FLOATING-POINT-INVALID-OPERATION)
+    (sb-int:with-float-traps-masked  (:invalid :divide-by-zero)
+      (geod-init (pointer g) a f))
+    (format t "TEST: init-ed, returning~%")
+    g))
+
+;;---------------------------------------------------------
+
+(defun direct-problem (g lat1 lon1 azi1 s12)
+  (cffi:with-foreign-objects ((plat2 :double 1)
+                              (plon2 :double 1)
+                              (pazi2 :double 1))
+
+    (geod-direct (pointer g)
+                 (float lat1 0.0d0)
+                 (float lon1 0.0d0)
+                 (float azi1 0.0d0)
+                 (float s12 0.0d0)
+                 plat2 plon2 pazi2)
+    (values
+     (cffi:mem-aref plat2 :double 0)
+     (cffi:mem-aref plon2 :double 0)
+     (cffi:mem-aref pazi2 :double 0))))
+
+;;---------------------------------------------------------
+
+(export '(geodesic make-geodesic direct-problem))
+
+#|
+(defclass geo-line (geo-object))
+(defun make-geo-line ())
+"geod_lineinit" GEOD-LINEINIT) :void
+
+"geod_inverse" GEOD-INVERSE) :void
+"geod_position" GEOD-POSITION) :void
+"geod_gendirect" GEOD-GENDIRECT) :double
+"geod_geninverse" GEOD-GENINVERSE) :double
+"geod_genposition" GEOD-GENPOSITION) :double
+
+(defclass geo-polygon (geo-object))
+(defun make-geo-polygon ())
+"geod_polygon_init" GEOD-POLYGON-INIT) :void
+"geod_polygon_addpoint" GEOD-POLYGON-ADDPOINT) :void
+"geod_polygon_addedge" GEOD-POLYGON-ADDEDGE) :void
+"geod_polygon_compute" GEOD-POLYGON-COMPUTE) :unsigned-int
+"geod_polygon_testpoint" GEOD-POLYGON-TESTPOINT) :unsigned-int
+"geod_polygon_testedge" GEOD-POLYGON-TESTEDGE) :unsigned-int
+"geod_polygonarea" GEOD-POLYGONAREA) :void
+|#
 
 ;; EOF

@@ -31,6 +31,31 @@
 
 ;; --------------------------------------------------------
 
+(define-test basic-geod-test
+  (let ((g (pj:make-geodesic)))
+    ;; where Hwasong-12 can land when launched from Pyongyang?
+    (let ((lat 39.033333)
+          (lon 125.75)
+          (azi 90.0)
+          ;; distance of a Hwasong-12 missile
+          (dist (* 4500 1000)))
+      (format t "TEST: calculating~%")
+      (multiple-value-bind (lat2 lon2 azi2)
+          (pj:direct-problem g lat lon azi dist)
+        (declare (ignore azi2))
+        (assert-equal "28.62326 173.33474"
+                      (format nil "~,5f ~,5f" lat2 lon2))))
+
+    ;; Example, determine the point 10000 km NE of JFK:
+    (multiple-value-bind (lat2 lon2 azi2)
+        (pj:direct-problem g 40.64 -73.78 45.0 10e6)
+      (declare (ignore azi2))
+      ;; (format t "TEST: lat2=~,2f lon2=~,2f azi2=~,2f~%" lat2 lon2 azi2)
+      (assert-equal "32.62110 49.05249"
+                    (format nil "~,5f ~,5f" lat2 lon2)))))
+
+;; --------------------------------------------------------
+
 (setf lisp-unit:*print-summary* T
       lisp-unit:*print-failures* T
       lisp-unit:*print-errors* T)
