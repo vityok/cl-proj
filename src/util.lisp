@@ -1,7 +1,7 @@
 ;;; Different utility functions for more convenient usage of the
 ;;; Proj.4 library
 
-;; Copyright (c) 2012, 2013, 2015 Victor Anyakin
+;; Copyright (c) 2012, 2013, 2015, 2017 Victor Anyakin
 ;; <anyakinvictor@yahoo.com> All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
@@ -383,5 +383,42 @@ this function with following parameters:
 	(values degs mins secs offset))))
 
 ;; (parse-degrees '(:d "°" :m "'" :s ) "47°7'50.09") => 47 7 50.09
+
+;;---------------------------------------------------------
+
+(defun missile-range (lat lon radius &key (count 360) (out T))
+  "Produce a GeoJSON LineString circumscribing the ciricle with the
+given radius (in meters) with the given center.
+
+Count specifies the number of points the LineString will contain, the
+higher the number, the smoother the circle."
+
+  (let ((g (pj:make-geodesic)))
+    (format out "{
+  \"type\": \"Feature\",
+  \"geometry\": {
+    \"type\": \"LineString\",
+    \"coordinates\": [
+")
+    (loop
+       :with step = (/ 360 count)
+       :for azi :from (+ 0 step) :to 360 :by step
+       :do
+       (progn
+         (multiple-value-bind (lat2 lon2 azi2)
+             (pj:direct-problem g lat lon azi radius)
+           (declare (ignore azi2))
+           ;; in GeoJSON first comes the longitude, then latitude
+           (format out "[~,5f, ~,5f],~%" lon2 lat2))))
+    (multiple-value-bind (lat2 lon2 azi2)
+        (pj:direct-problem g lat lon 0 radius)
+      (declare (ignore azi2))
+      (format out "[~,5f, ~,5f]~%" lon2 lat2))
+    (format out "]} }")))
+
+#+ignore
+(with-open-file (out "range.json" :direction :output :if-exists :supersede)
+      (missile-range 39.033333 125.75 (* 500 1000) :out out))
+;; ogr2ogr -f KML range.kml range.json
 
 ;; EOF
