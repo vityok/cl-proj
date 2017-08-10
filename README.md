@@ -13,10 +13,8 @@ PROJ.4 homepage is: [trac.osgeo.org/proj](http://trac.osgeo.org/proj/)
 
 Original CL-PROJ homepage is:
 [cl-proj.sourceforge.net](http://cl-proj.sourceforge.net/) and the
-project page is:
-[sourceforge.net/projects/cl-proj](http://sourceforge.net/projects/cl-proj/). However,
-project development is moving to [a new
-site](https://bitbucket.org/vityok/cl-proj).
+project page is: [at the
+Bitbucket](https://bitbucket.org/vityok/cl-proj).
 
 Released files can be downloaded from [the downloads
 page](http://sourceforge.net/projects/cl-proj/files). And it can also
@@ -33,17 +31,32 @@ Symbols are defined in the `cl-proj` package and are also available
 using the `pj` package nickname.
 
 Constants, variables and functions are extremely close to the
-PROJ.4. API is documented in the <api.html> file that is supplied in
-the distribution.
+PROJ.4. Bindings for geodesic functions are also provided in addition
+to the core Proj4 API. Reference is in the <api.html> file that is
+supplied in the distribution.
 
 Primary development platform is recent Ubuntu Linux distribution with
 recent versions of SBCL and ECL Common Lisps.
 
+In addition to Proj4 library bindings this package a number of utility
+functions, including:
+
+* Parsing degrees from a string and conversion between
+  degree-minutes-seconds and decimal representations
+
+* Simplification of polygons/polylines (reducing number of vertices)
+  using the Ramer–Douglas–Peucker algorithm
+
+* Projecting points from a geographic space onto a screen with the
+  given dimensions and viewport
+
+* Construction of circular lines with the given radius and center
+  (like missile ranges, etc.)
 
 Copying
 =======
 
-    Copyright (c) 2012,2015, Victor Anyakin <anyakinvictor@yahoo.com>
+    Copyright (c) 2012,2015,2017 Victor Anyakin <anyakinvictor@yahoo.com>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -60,11 +73,10 @@ Copying
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
     WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-    DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+    DISCLAIMED. IN NO EVENT SHALL Victor Anyakin BE LIABLE FOR ANY
     DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
     (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-

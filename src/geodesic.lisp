@@ -681,12 +681,15 @@ printf(\"%.0f %.2f\n\", A, P);
   ;; todo: let trivial-garbage handle memory cleanup
   (let ((g (make-instance 'geodesic)))
     (setf (pointer g) (cffi:foreign-alloc '(:struct geod-geodesic)))
-    (format t "TEST: allocated, init-ing (~a, ~a)~%" a f)
+    ;; (format t "TEST: allocated, init-ing (~a, ~a)~%" a f)
     ;; for whatever reason geod_init raises division by zero error
     ;; (FLOATING-POINT-INVALID-OPERATION)
+    #+sbcl
     (sb-int:with-float-traps-masked  (:invalid :divide-by-zero)
       (geod-init (pointer g) a f))
-    (format t "TEST: init-ed, returning~%")
+    #-sbcl
+    (geod-init (pointer g) a f)
+    ;; (format t "TEST: init-ed, returning~%")
     g))
 
 ;;---------------------------------------------------------

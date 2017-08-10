@@ -1,6 +1,6 @@
 ;;; -*- mode: lisp; -*-
 
-;; Copyright (c) 2012, Victor Anyakin <anyakinvictor@yahoo.com>
+;; Copyright (c) 2012, 2017 Victor Anyakin <anyakinvictor@yahoo.com>
 ;; All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
@@ -44,12 +44,14 @@
   ((:module "src"
 	    :serial t
 	    :components ((:file "package")
+                         ;; todo: grovel proj_api.h as well
                          (cffi-grovel:grovel-file "grovel-geodesic")
 			 (:file "proj-api")
                          (:file "geodesic")
 			 (:file "util"))))
   :depends-on (:cffi
-	       :parse-number))
+	       :parse-number
+               :trivial-garbage))
 
 
 ;; EOF
