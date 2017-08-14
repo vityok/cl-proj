@@ -678,18 +678,17 @@ printf(\"%.0f %.2f\n\", A, P);
 ;;---------------------------------------------------------
 
 (defun make-geodesic (&key (a +equatorial-radius+) (f +flattening+))
-  ;; todo: let trivial-garbage handle memory cleanup
-  (let ((g (make-instance 'geodesic)))
-    (setf (pointer g) (cffi:foreign-alloc '(:struct geod-geodesic)))
-    ;; (format t "TEST: allocated, init-ing (~a, ~a)~%" a f)
-    ;; for whatever reason geod_init raises division by zero error
-    ;; (FLOATING-POINT-INVALID-OPERATION)
+  (let ((g (make-instance 'geodesic))
+        (ptr (cffi:foreign-alloc '(:struct geod-geodesic))))
+    (setf (pointer g) ptr)
+    (tg:finalize g (lambda () (cffi:foreign-free ptr)))
+    ;; avoid FLOATING-POINT-INVALID-OPERATION generated from within
+    ;; the native code. SBCL-compatible approach
     #+sbcl
     (sb-int:with-float-traps-masked  (:invalid :divide-by-zero)
       (geod-init (pointer g) a f))
     #-sbcl
     (geod-init (pointer g) a f)
-    ;; (format t "TEST: init-ed, returning~%")
     g))
 
 ;;---------------------------------------------------------
@@ -712,14 +711,55 @@ printf(\"%.0f %.2f\n\", A, P);
 
 ;;---------------------------------------------------------
 
-(export '(geodesic make-geodesic direct-problem))
+(defun inverse-problem (g lat1 lon1 lat2 lon2)
+  "Solve the inverse geodesic problem.
+
+Returns three values:
+* distance between point 1 and point 2 (meters).
+* azimuth at point 1 (degrees).
+* (forward) azimuth at point 2 (degrees).
+
+Example, determine the distance between JFK and Singapore Changi
+Airport:
+
+ (let ((g (pj:make-geodesic)))
+   (multiple-value-bind (ps12 pazi1 pazi2)
+             (pj:inverse-problem g 40.64 -73.78 1.36 103.99)
+           (declare (ignore pazi1 pazi2))
+           (format t \"~,3f~%\" ps12)))
+
+See: `GEOD-INVERSE'
+"
+  (cffi:with-foreign-objects ( ;; distance between point 1 and point 2
+                              (ps12 :double 1)
+                              ;; azimuth at point 1 (degrees)
+                              (pazi1 :double 1)
+                              ;; (forward) azimuth at point 2 (degrees)
+                              (pazi2 :double 1))
+
+    (geod-inverse (pointer g)
+                  (float lat1 0.0d0)
+                  (float lon1 0.0d0)
+                  (float lat2 0.0d0)
+                  (float lon2 0.0d0)
+                  ps12 pazi1 pazi2)
+    (values
+     (cffi:mem-aref ps12 :double 0)
+     (cffi:mem-aref pazi1 :double 0)
+     (cffi:mem-aref pazi2 :double 0))))
+
+;;---------------------------------------------------------
+
+(export '(geodesic make-geodesic
+          direct-problem inverse-problem))
+
+;;---------------------------------------------------------
 
 #|
 (defclass geo-line (geo-object))
 (defun make-geo-line ())
 "geod_lineinit" GEOD-LINEINIT) :void
 
-"geod_inverse" GEOD-INVERSE) :void
 "geod_position" GEOD-POSITION) :void
 "geod_gendirect" GEOD-GENDIRECT) :double
 "geod_geninverse" GEOD-GENINVERSE) :double

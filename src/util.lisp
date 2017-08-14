@@ -393,7 +393,10 @@ given radius (in meters) with the given center.
 Count specifies the number of points the Polygon will contain, the
 higher the number, the smoother the circle.
 
-Example: area within Hwasong-12 missile range when from Pyongyang?
+Example: area within Hwasong-12 missile range when fired from
+Pyongyang? NB: here we assume the range to be 4500, however, Wikipedia
+mentions estimates within range of 3700-6000 km.
+
   (with-open-file (out \"range.json\" :direction :output :if-exists :supersede)
     (missile-range 39.033333 125.75 (* 4500 1000) :out out))
 
