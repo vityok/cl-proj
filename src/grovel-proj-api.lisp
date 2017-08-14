@@ -1,6 +1,6 @@
-;;; -*- mode: lisp; -*-
+;;; groveler definitions from the proj_api.h file
 
-;; Copyright (c) 2012, 2017 Victor Anyakin <anyakinvictor@yahoo.com>
+;; Copyright (c) 2017 Victor Anyakin <anyakinvictor@yahoo.com>
 ;; All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
@@ -17,7 +17,7 @@
 ;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ;; ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ;; WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-;; DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+;; DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
 ;; DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 ;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 ;; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -25,33 +25,35 @@
 ;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ;; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-(in-package :cl-user)
+(in-package :proj-types)
 
-(defpackage :cl-proj-asd
-  (:use :cl :asdf))
+;; --------------------------------------------------------
 
-(in-package :cl-proj-asd)
+(include "proj_api.h")
 
-(cl:eval-when (:load-toplevel :execute)
-  (asdf:load-system :cffi-grovel))
+;; --------------------------------------------------------
 
-(asdf:defsystem :cl-proj
-  :description "CL-PROJ provides Proj.4 library bindings"
-  :version "4.9.2"
-  :author "Victor Anyakin <anyakinvictor@yahoo.com>"
-  :licence "BSD"
-  :components
-  ((:module "src"
-	    :serial t
-	    :components ((:file "package")
-                         (cffi-grovel:grovel-file "grovel-proj-api")
-                         (cffi-grovel:grovel-file "grovel-geodesic")
-			 (:file "proj-api")
-                         (:file "geodesic")
-			 (:file "util"))))
-  :depends-on (:cffi
-	       :parse-number
-               :trivial-garbage))
+(constant (+pj-version+ "PJ_VERSION"))
 
+(cvar ("pj_release" pj-release) :string)
+
+;; --------------------------------------------------------
+
+(constant (+rad-to-deg+ "RAD_TO_DEG") :type double-float)
+(constant (+deg-to-rad+ "DEG_TO_RAD") :type double-float)
+
+;; --------------------------------------------------------
+
+(cvar ("pj_errno" PJ-ERRNO) :int)
+
+;; --------------------------------------------------------
+
+(cstruct proj-uv "projUV"
+         (u "u" :type :double)
+         (v "v" :type :double))
+
+;; --------------------------------------------------------
+
+;; TODO:     typedef void *projCtx; and relevant functions
 
 ;; EOF

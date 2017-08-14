@@ -1,4 +1,4 @@
-;; Copyright (c) 2012, 2013 Victor Anyakin <anyakinvictor@yahoo.com>
+;; Copyright (c) 2012, 2013, 2017 Victor Anyakin <anyakinvictor@yahoo.com>
 ;; All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
@@ -42,27 +42,8 @@
 
 ;; --------------------------------------------------------
 
-(cl:defconstant +PJ-VERSION+ 470)
-
-(cffi:defcvar ("pj_release" PJ-RELEASE)
-    :string)
-
-(cl:defconstant +RAD-TO-DEG+ 57.29577951308232d0)
-
-(cl:defconstant +DEG-TO-RAD+ .0174532925199432958d0)
-
-(cffi:defcvar ("pj_errno" PJ-ERRNO)
-    :int)
-
 (cffi:defctype proj-pj :pointer "projPJ")
-
 ;; TODO:     typedef void *projCtx; and relevant functions
-
-;; --------------------------------------------------------
-
-(cffi:defcstruct proj-uv
-  (u :double)
-  (v :double))
 
 ;; --------------------------------------------------------
 

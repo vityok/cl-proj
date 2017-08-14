@@ -34,6 +34,17 @@
 
 ;; --------------------------------------------------------
 
+(defpackage :proj-types
+  (:use #:cl #:cffi)
+  (:nicknames :proj-types)
+  (:documentation "Proj API types produced by groveling the proj_api.h
+  header file.")
+  (:export :+pj-version+ :pj-release
+           :+rad-to-deg+ :+deg-to-rad+
+           :pj-errno :proj-uv))
+
+;; --------------------------------------------------------
+
 (defpackage :geodesic-types
   (:use #:cl #:cffi)
   (:nicknames :geo-types)
@@ -47,7 +58,7 @@
 ;; --------------------------------------------------------
 
 (defpackage :cl-proj
-  (:use :cl #:geodesic-types)
+  (:use :cl #:proj-types #:geodesic-types)
   (:nicknames :pj)
   (:documentation "CL-PROJ provides bindings for the Proj.4 library.
 
