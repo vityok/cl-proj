@@ -61,6 +61,36 @@
         (declare (ignore pazi1 pazi2))
         (assert-equal "15347512.990"
                       (format nil "~,3f" ps12)))
+
+      ;; Example, compute way points between JFK and Singapore Changi
+      ;; Airport. Test DIRECT-PROBLEM and GEO-POSITION
+      (let ((str-a
+             ;; the 'obvious' way using GEO-DIRECT:
+             (with-output-to-string (out-a)
+               (let ((g (pj:make-geodesic)))
+                 (multiple-value-bind (s12 azi1 azi2)
+                     (pj:inverse-problem g 40.64 -73.78 1.36 103.99)
+                   (declare (ignore azi2))
+                   (loop :for i :from 0 :to 100
+                      :do (multiple-value-bind (lati loni azii)
+                              (pj:direct-problem g 40.64 -73.78 azi1 (* i s12 0.01))
+                            (declare (ignore azii))
+                            (format out-a "~,5f ~,5f~%" lati loni)))))))
+            (str-b
+             ;; A faster way using GEOD-POSITION:
+             (with-output-to-string (out-b)
+               (let ((g (pj:make-geodesic)))
+                 (multiple-value-bind (s12 azi1 azi2)
+                     (pj:inverse-problem g 40.64 -73.78 1.36 103.99)
+                   (declare (ignore azi2))
+                   (let ((l (pj:make-geo-line g 40.64 -73.78 azi1)))
+                     (loop :for i :from 0 :to 100
+                        :do (multiple-value-bind (lati loni azii)
+                                (pj:geo-position l (* s12 i 0.01))
+                              (declare (ignore azii))
+                              (format out-b "~,5f ~,5f~%" lati loni)))))))))
+        (assert-equal str-a str-b))
+
       ))
 
 ;; --------------------------------------------------------
