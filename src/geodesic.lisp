@@ -196,16 +196,17 @@ Example, determine the distance between JFK and Singapore Changi Airport:
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("geod_position" GEOD-POSITION) :void
-  "Compute the position along a geod_geodesicline.
+  "@short{Compute the position along a geod_geodesicline.}
 
- @param[in] l a pointer to the geod_geodesicline object specifying the
-   geodesic line.
- @param[in] s12 distance between point 1 and point 2 (meters); it can be
-   negative.
- @param[out] plat2 pointer to the latitude of point 2 (degrees).
- @param[out] plon2 pointer to the longitude of point 2 (degrees); requires
+ @arg[l]{a pointer to the geod_geodesicline object specifying the
+   geodesic line.}
+ @arg[s12]{distance between point 1 and point 2 (meters); it can be
+   negative.}
+
+ param[out] plat2 pointer to the latitude of point 2 (degrees).
+ param[out] plon2 pointer to the longitude of point 2 (degrees); requires
    that \e l was initialized with \e caps |= GEOD_LONGITUDE.
- @param[out] pazi2 pointer to the (forward) azimuth at point 2 (degrees).
+ param[out] pazi2 pointer to the (forward) azimuth at point 2 (degrees).
 
  \e l must have been initialized with a call to geod_lineinit() with \e
  caps |= GEOD_DISTANCE_IN.  The values of \e lon2 and \e azi2 returned are
@@ -215,7 +216,8 @@ Example, determine the distance between JFK and Singapore Changi Airport:
 
  Example, compute way points between JFK and Singapore Changi Airport
  the 'obvious' way using geod_direct():
-@code{.c}
+
+@begin{code}
 struct geod_geodesic g;
 double s12, azi1, lat[101],lon[101];
 int i;
@@ -225,11 +227,11 @@ for (i = 0; i < 101; ++i) {
   geod_direct(&g, 40.64, -73.78, azi1, i * s12 * 0.01, lat + i, lon + i, 0);
   printf(\"%.5f %.5f\n\", lat[i], lon[i]);
 }
-@endcode
+@end{code}
 
  A faster way using geod_position():
 
-@code{.c}
+@begin{code}
 struct geod_geodesic g;
 struct geod_geodesicline l;
 double s12, azi1, lat[101],lon[101];
@@ -241,7 +243,7 @@ for (i = 0; i < 101; ++i) {
   geod_position(&l, i * s12 * 0.01, lat + i, lon + i, 0);
   printf(\"%.5f %.5f\n\", lat[i], lon[i]);
 }
-   @endcode
+@end{code}
 "
   (l (:pointer (:struct geod-geodesicline)))
   (s12 :double)
@@ -824,15 +826,15 @@ direct problem).
 ;;---------------------------------------------------------
 
 (defun geo-position (l s12)
-  "Compute the position along a geod_geodesicline.
+  "@short{Compute the position along a geod_geodesicline.}
 
  @arg[l]{a pointer to the geod_geodesicline object specifying the geodesic line.}
  @arg[s12]{distance between point 1 and point 2 (meters); it can be negative.}
 
- @param[out] plat2 pointer to the latitude of point 2 (degrees).
- @param[out] plon2 pointer to the longitude of point 2 (degrees); requires
+ param[out] plat2 pointer to the latitude of point 2 (degrees).
+ param[out] plon2 pointer to the longitude of point 2 (degrees); requires
    that \e l was initialized with \e caps |= GEOD_LONGITUDE.
- @param[out] pazi2 pointer to the (forward) azimuth at point 2 (degrees).
+ param[out] pazi2 pointer to the (forward) azimuth at point 2 (degrees).
 
  \e l must have been initialized with a call to geod_lineinit() with \e
  caps |= GEOD_DISTANCE_IN.  The values of \e lon2 and \e azi2 returned are
@@ -843,6 +845,7 @@ direct problem).
  Example, compute way points between JFK and Singapore Changi Airport
  the 'obvious' way using GEO-DIRECT:
 
+@begin{code}
 (let ((g (pj:make-geodesic)))
   (multiple-value-bind (s12 azi1 azi2)
       (pj:inverse-problem g 40.64 -73.78 1.36 103.99)
@@ -851,9 +854,11 @@ direct problem).
 	       (pj:direct-problem g 40.64 -73.78 azi1 (* i s12 0.01))
 	     (declare (ignore azii))
 	     (format t \"~,5f ~,5f~%\" lati loni)))))
+@end{code}
 
  A faster way using GEOD-POSITION:
 
+@begin{code}
 (let ((g (pj:make-geodesic)))
   (multiple-value-bind (s12 azi1 azi2)
       (pj:inverse-problem g 40.64 -73.78 1.36 103.99)
@@ -864,6 +869,7 @@ direct problem).
                  (pj:geo-position l (* s12 i 0.01))
                (declare (ignore azii))
                (format t \"~,5f ~,5f~%\" lati loni))))))
+@end{code}
 "
   (cffi:with-foreign-objects ((plat2 :double 1)
                               (plon2 :double 1)
@@ -951,7 +957,7 @@ what sense the geodesic encircles the ellipsoid.
 ;;---------------------------------------------------------
 
 (defun general-inverse-problem (g lat1 lon1 lat2 lon2)
-  "The general inverse geodesic calculation.
+  "@short{The general inverse geodesic calculation.}
 
 @arg[g]{GEO-GEODESIC object specifying the ellipsoid.}
 @param[in] lat1 latitude of point 1 (degrees).
@@ -1086,17 +1092,164 @@ on a map.
 (export 'general-position)
 
 ;;---------------------------------------------------------
-#|
 
 (defclass geo-polygon (geo-object) ())
-(defun make-geo-polygon ())
-"geod_polygon_init" GEOD-POLYGON-INIT) :void
-"geod_polygon_addpoint" GEOD-POLYGON-ADDPOINT) :void
-"geod_polygon_addedge" GEOD-POLYGON-ADDEDGE) :void
-"geod_polygon_compute" GEOD-POLYGON-COMPUTE) :unsigned-int
-"geod_polygon_testpoint" GEOD-POLYGON-TESTPOINT) :unsigned-int
-"geod_polygon_testedge" GEOD-POLYGON-TESTEDGE) :unsigned-int
-"geod_polygonarea" GEOD-POLYGONAREA) :void
-|#
+(export 'geo-polygon)
+
+;;---------------------------------------------------------
+
+(defun make-geo-polygon (&optional polylinep)
+  "@short{Initialize a geod_polygon object.}
+
+@arg[polylinep]{non-NIL if a polyline instead of a polygon.}
+
+If \e polylinep is NIL, then the sequence of vertices and edges added by
+geod_polygon_addpoint() and geod_polygon_addedge() define a polygon and
+the perimeter and area are returned by geod_polygon_compute().  If \e
+polylinep is non-zero, then the vertices and edges define a polyline and
+only the perimeter is returned by geod_polygon_compute().
+
+The area and perimeter are accumulated at two times the standard floating
+point precision to guard against the loss of accuracy with many-sided
+polygons.  At any point you can ask for the perimeter and area so far.
+
+An example of the use of this function is given in the documentation for
+geod_polygon_compute().
+"
+  (let ((l (make-instance 'geo-polygon))
+        (ptr (cffi:foreign-alloc '(:struct geod-polygon))))
+    (setf (pointer l) ptr)
+    (tg:finalize l (lambda () (cffi:foreign-free ptr)))
+    (geod-polygon-init ptr
+                       (if polylinep 1 0))))
+(export 'make-geo-polygon)
+
+;;---------------------------------------------------------
+
+(defun polygon-add-point (g p lat lon)
+  (geod-polygon-addpoint
+   (pointer g)
+   (pointer p)
+   (float lat 0.0d0)
+   (float lon 0.0d0)))
+(export 'polygon-add-point)
+
+;;---------------------------------------------------------
+
+(defun polygon-add-edge (g p azi s)
+  (geod-polygon-addedge
+   (pointer g)
+   (pointer p)
+   (float azi 0.0d0)
+   (float s 0.0d0)))
+(export 'polygon-add-edge)
+
+;;---------------------------------------------------------
+
+(defun polygon-compute (g p &key reverse sign)
+  (cffi:with-foreign-objects ((pa :double 1)
+                              (pp :double 1))
+    (let ((count (geod-polygon-compute
+                  (pointer g)
+                  (pointer p)
+                  (if reverse 1 0)
+                  (if sign 1 0)
+                  pa pp)))
+      (values count
+              (cffi:mem-aref pa :double 0)
+              (cffi:mem-aref pp :double 0)))))
+(export 'polygon-compute)
+
+;;---------------------------------------------------------
+;; "geod_polygon_testpoint" GEOD-POLYGON-TESTPOINT) :unsigned-int
+(defun polygon-test-point (g p lat lon &key reverse sign)
+  (cffi:with-foreign-objects ((pa :double 1)
+                              (pp :double 1))
+
+    (let ((count
+           (geod-polygon-testpoint
+            (pointer g)
+            (pointer p)
+            (float lat 0.0d0)
+            (float lon 0.0d0)
+            (if reverse 1 0)
+            (if sign 1 0)
+            pa pp)))
+      (values count
+              (cffi:mem-aref pa :double 0)
+              (cffi:mem-aref pp :double 0)))))
+(export 'polygon-test-point)
+
+;;---------------------------------------------------------
+;; "geod_polygon_testedge" GEOD-POLYGON-TESTEDGE) :unsigned-int
+(defun polygon-test-edge (g p azi s &key reverse sign)
+  (cffi:with-foreign-objects ((pa :double 1)
+                              (pp :double 1))
+    (let ((count
+           (geod-polygon-testedge
+            (pointer g)
+            (pointer p)
+            (float azi 0.0d0)
+            (float s 0.0d0)
+            (if reverse 1 0)
+            (if sign 1 0)
+            pa pp)))
+      (values count
+              (cffi:mem-aref pa :double 0)
+              (cffi:mem-aref pp :double 0)))))
+
+;;---------------------------------------------------------
+
+(defun polygon-area (g lats lons)
+  "@short{A simple interface for computing the area of a geodesic polygon.}
+
+@param[in] g a pointer to the geod_geodesic object specifying the
+  ellipsoid.
+@param[in] lats an array of latitudes of the polygon vertices (degrees).
+@param[in] lons an array of longitudes of the polygon vertices (degrees).
+@param[in] n the number of vertices.
+@param[out] pA pointer to the area of the polygon (meters<sup>2</sup>).
+@param[out] pP pointer to the perimeter of the polygon (meters).
+
+\e lats should be in the range [&minus;90&deg;, 90&deg;].
+
+Only simple polygons (which are not self-intersecting) are allowed.
+There's no need to 'close' the polygon by repeating the first vertex.  The
+area returned is signed with counter-clockwise traversal being treated as
+positive.
+
+Example, compute the area of Antarctica:
+
+(let ((g (pj:make-geodesic))
+      (lats '(-72.9 -71.9 -74.9 -74.3 -77.5 -77.4 -71.7 -65.9 -65.7
+              -66.6 -66.9 -69.8 -70.0 -71.0 -77.3 -77.9 -74.7))
+      (lons '(-74 -102 -102 -131 -163 163 172 140 113
+              88 59 25 -4 -14 -33 -46 -61)))
+  (multiple-value-bind (count pa pp)
+      (pj:polygon-area g lats lons)
+    (declare (ignore count))
+    (list pa pp)))
+"
+  (let ((count (length lats)))
+    (cffi:with-foreign-objects ((nlats :double count)
+                                (nlons :double count)
+                                (pa :double 1)
+                                (pp :double 1))
+      (loop :for lat :in lats
+         :for lon :in lons
+         :for i :from 0 :below count
+         :do (setf (cffi:mem-aref nlats :double i) (float lat 0.0d0)
+                   (cffi:mem-aref nlons :double i) (float lon 0.0d0)))
+
+      (geod-polygonarea
+       (pointer g) 
+       nlats
+       nlons
+       (length lats)
+       pa pp)
+      (values count
+              (cffi:mem-aref pa :double 0)
+              (cffi:mem-aref pp :double 0)))))
+(export 'polygon-area)
 
 ;; EOF

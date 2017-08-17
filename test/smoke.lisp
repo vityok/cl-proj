@@ -117,7 +117,21 @@
 4.128 103.869
 2.744 103.930
 1.360 103.990
-")))))
+")))
+
+      ;; Example, compute the area of Antarctica:
+      (let ((g (pj:make-geodesic))
+            (lats '(-72.9 -71.9 -74.9 -74.3 -77.5 -77.4 -71.7 -65.9 -65.7
+                    -66.6 -66.9 -69.8 -70.0 -71.0 -77.3 -77.9 -74.7))
+            (lons '(-74 -102 -102 -131 -163 163 172 140 113
+                    88 59 25 -4 -14 -33 -46 -61)))
+        (multiple-value-bind (count pa pp)
+            (pj:polygon-area g lats lons)
+          (declare (ignore count))
+          ;; Area in m^2 and perimeter in meters
+          (assert-equal "13376855976704.344 14710425.494044874"
+                        (format nil "~f ~f" pa pp))))
+      ))
 
 ;; --------------------------------------------------------
 
