@@ -141,6 +141,7 @@
 (lisp-unit:use-debugger T)
 
 (defun run ()
+  (format t "Proj4 version: ~a, release: ~a~%" pj:+pj-version+ pj:pj-release)
   (lisp-unit:print-errors
    (lisp-unit:run-tests :all (find-package 'proj-smoke-test))))
 
