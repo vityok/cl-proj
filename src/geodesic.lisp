@@ -134,7 +134,7 @@ Example, determine the point 10000 km NE of JFK:
    geod_direct(&g, 40.64, -73.78, 45.0, 10e6, &lat, &lon, 0);
    printf(\"%.5f %.5f\n\", lat, lon);
 "
-  (g (:pointer geod-geodesic))
+  (g (:pointer (:struct geod-geodesic)))
   (lat1 :double)
   (lon1 :double)
   (azi1 :double)
@@ -184,7 +184,7 @@ Example, determine the distance between JFK and Singapore Changi Airport:
    printf(\"%.3f\n\", s12);
    @endcode
 "
-  (g (:pointer geod-geodesic))
+  (g (:pointer (:struct geod-geodesic)))
   (lat1 :double)
   (lon1 :double)
   (lat2 :double)
@@ -243,7 +243,7 @@ for (i = 0; i < 101; ++i) {
 }
    @endcode
 "
-  (l (:pointer geod-geodesicline))
+  (l (:pointer (:struct geod-geodesicline)))
   (s12 :double)
   (plat2 (:pointer :double))
   (plon2 (:pointer :double))
@@ -289,7 +289,7 @@ With \e flags & GEOD_LONG_UNROLL bit set, the longitude is 'unrolled' so
 that the quantity \e lon2 &minus; \e lon1 indicates how many times and in
 what sense the geodesic encircles the ellipsoid.
 "
-  (g (:pointer geod-geodesic))
+  (g (:pointer (:struct geod-geodesic)))
   (lat1 :double)
   (lon1 :double)
   (azi1 :double)
@@ -333,7 +333,7 @@ what sense the geodesic encircles the ellipsoid.
 'return' arguments \e ps12, etc., may be replaced by 0, if you do not need
 some quantities computed.
 "
-  (g (:pointer geod-geodesic))
+  (g (:pointer (:struct geod-geodesic)))
   (lat1 :double)
   (lon1 :double)
   (lat2 :double)
@@ -413,7 +413,7 @@ for (i = 0; i < 101; ++i) {
 }
 @endcode
 "
-  (l (:pointer geod-geodesicline))
+  (l (:pointer (:struct geod-geodesicline)))
   (flags :unsigned-int)
   (s12_a12 :double)
   (plat2 (:pointer :double))
@@ -446,7 +446,7 @@ polygons.  At any point you can ask for the perimeter and area so far.
 An example of the use of this function is given in the documentation for
 geod_polygon_compute().
 "
-  (p (:pointer geod-polygon))
+  (p (:pointer (:struct geod-polygon)))
   (polylinep :int))
 
 ;; --------------------------------------------------------
@@ -469,8 +469,8 @@ points and edges in a polygon.  \e lat should be in the range
 An example of the use of this function is given in the documentation for
 geod_polygon_compute().
 "
-  (g (:pointer geod-geodesic))
-  (p (:pointer geod-polygon))
+  (g (:pointer (:struct geod-geodesic)))
+  (p (:pointer (:struct geod-polygon)))
   (lat :double)
   (lon :double))
 
@@ -491,8 +491,8 @@ geod_polygon_init(), respectively.  The same \e g must be used for all the
 points and edges in a polygon.  This does nothing if no points have been
 added yet.  The \e lat and \e lon fields of \e p give the location of the
 new vertex."
-  (g (:pointer geod-geodesic))
-  (p (:pointer geod-polygon))
+  (g (:pointer (:struct geod-geodesic)))
+  (p (:pointer (:struct geod-polygon)))
   (azi :double)
   (s :double))
 
@@ -538,8 +538,8 @@ geod_polygon_addpoint(&g, &p, 90,  0);
 n = geod_polygon_compute(&g, &p, 0, 1, &A, &P);
 printf(\"%d %.8f %.3f\n\", n, P, A);
 @endcode"
-  (g (:pointer geod-geodesic))
-  (p (:pointer geod-polygon))
+  (g (:pointer (:struct geod-geodesic)))
+  (p (:pointer (:struct geod-polygon)))
   (reverse :int)
   (sign :int)
   (pa (:pointer :double))
@@ -572,8 +572,8 @@ than if geod_polygon_addpoint() and geod_polygon_compute() are used.
 @return the number of points.
 
 \e lat should be in the range [&minus;90&deg;, 90&deg;]."
-  (g (:pointer geod-geodesic))
-  (p (:pointer geod-polygon))
+  (g (:pointer (:struct geod-geodesic)))
+  (p (:pointer (:struct geod-polygon)))
   (lat :double)
   (lon :double)
   (reverse :int)
@@ -608,8 +608,8 @@ geod_polygon_compute() are used.
   polyline (meters).
 @return the number of points."
 
-  (g (:pointer geod-geodesic))
-  (p (:pointer geod-polygon))
+  (g (:pointer (:struct geod-geodesic)))
+  (p (:pointer (:struct geod-polygon)))
   (azi :double)
   (s :double)
   (reverse :int)
@@ -651,7 +651,7 @@ geod_polygonarea(&g, lats, lons, (sizeof lats) / (sizeof lats[0]), &A, &P);
 printf(\"%.0f %.2f\n\", A, P);
 @endcode"
 
-  (g (:pointer geod-geodesic))
+  (g (:pointer (:struct geod-geodesic)))
   (lats (:pointer :double))
   (lons (:pointer :double))
   (n :int)
@@ -660,6 +660,19 @@ printf(\"%.0f %.2f\n\", A, P);
 
 ;; --------------------------------------------------------
 ;; HIGH LEVEL WRAPPERS
+;; --------------------------------------------------------
+
+(defun convert-flags-to-foreign (flags enum)
+  "Converts list of flags from the given ENUM into a foreign/native
+integer using bitwise OR (LOGIOR).
+
+Flags can be declared using Groveler as a CENUM."
+  (apply #'logior
+         (map 'list
+              #'(lambda (f)
+                  (cffi:convert-to-foreign f enum))
+              flags)))
+
 ;; --------------------------------------------------------
 
 (defclass geo-object ()
@@ -803,7 +816,7 @@ direct problem).
      (float lon1 0.0d0)
      (float azi1 0.0d0)
      (if caps
-         (cffi:convert-to-foreign caps 'geod-mask)
+         (convert-flags-to-foreign caps 'geod-mask)
          0))
     l))
 (export 'make-geo-line)
@@ -859,7 +872,7 @@ direct problem).
      (pointer l)
      (float s12 0.0d0)
      plat2 plon2 pazi2)
-    (values 
+    (values
      (cffi:mem-aref plat2 :double 0)
      (cffi:mem-aref plon2 :double 0)
      (cffi:mem-aref pazi2 :double 0))))
@@ -925,7 +938,7 @@ what sense the geodesic encircles the ellipsoid.
                 ps12 pm12 p-M12
                 pM21 p-S12)))
 
-      (values (cffi:mem-aref a12 :double 0)
+      (values a12
               (cffi:mem-aref plat2 :double 0)
               (cffi:mem-aref plon2 :double 0)
               (cffi:mem-aref pazi2 :double 0)
@@ -936,10 +949,144 @@ what sense the geodesic encircles the ellipsoid.
               (cffi:mem-aref p-S12 :double 0)))))
 
 ;;---------------------------------------------------------
-#|
 
-"geod_geninverse" GEOD-GENINVERSE) :double
-"geod_genposition" GEOD-GENPOSITION) :double
+(defun general-inverse-problem (g lat1 lon1 lat2 lon2)
+  "The general inverse geodesic calculation.
+
+@arg[g]{GEO-GEODESIC object specifying the ellipsoid.}
+@param[in] lat1 latitude of point 1 (degrees).
+@param[in] lon1 longitude of point 1 (degrees).
+@param[in] lat2 latitude of point 2 (degrees).
+@param[in] lon2 longitude of point 2 (degrees).
+@param[out] ps12 pointer to the distance between point 1 and point 2
+ (meters).
+@param[out] pazi1 pointer to the azimuth at point 1 (degrees).
+@param[out] pazi2 pointer to the (forward) azimuth at point 2 (degrees).
+@param[out] pm12 pointer to the reduced length of geodesic (meters).
+@param[out] pM12 pointer to the geodesic scale of point 2 relative to
+  point 1 (dimensionless).
+@param[out] pM21 pointer to the geodesic scale of point 1 relative to
+  point 2 (dimensionless).
+@param[out] pS12 pointer to the area under the geodesic
+  (meters<sup>2</sup>).
+@return \e a12 arc length of between point 1 and point 2 (degrees).
+
+\e g must have been initialized with a call to geod_init().  \e lat1 and
+\e lat2 should be in the range [&minus;90&deg;, 90&deg;].
+"
+  (cffi:with-foreign-objects ((ps12  :double 1)
+                              (pazi1 :double 1)
+                              (pazi2 :double 1)
+                              (pm12  :double 1)
+                              (p-M12 :double 1)
+                              (pM21  :double 1)
+                              (p-S12 :double 1))
+    (let ((a12 (geod-geninverse
+                (pointer g)
+                (float lat1 0.0d0)
+                (float lon1 0.0d0)
+                (float lat2 0.0d0)
+                (float lon2 0.0d0)
+                ps12 pazi1 pazi2
+                pm12 p-M12 pM21 p-S12)))
+      (values a12
+              (cffi:mem-aref ps12  :double 0)
+              (cffi:mem-aref pazi1 :double 0)
+              (cffi:mem-aref pazi2 :double 0)
+              (cffi:mem-aref pm12  :double 0)
+              (cffi:mem-aref p-M12 :double 0)
+              (cffi:mem-aref pM21  :double 0)
+              (cffi:mem-aref p-S12 :double 0)))))
+(export 'general-inverse-problem)
+
+;;---------------------------------------------------------
+(defun general-position (l flags s12_a12)
+  "@short{The general position function.}
+
+@arg[l]{GEO-LINE object specifying the geodesic line.}
+@arg[flags] bitor'ed combination of GEOD-FLAGS; \e flags &
+  GEOD_ARCMODE determines the meaning of \e s12_a12 and \e flags &
+  GEOD_LONG_UNROLL 'unrolls' \e lon2; if \e flags & GEOD_ARCMODE is 0,
+  then \e l must have been initialized with \e caps |= GEOD_DISTANCE_IN.
+@param[in] s12_a12 if \e flags & GEOD_ARCMODE is 0, this is the
+  distance between point 1 and point 2 (meters); otherwise it is the
+  arc length between point 1 and point 2 (degrees); it can be
+  negative.
+@param[out] plat2 pointer to the latitude of point 2 (degrees).
+@param[out] plon2 pointer to the longitude of point 2 (degrees); requires
+  that \e l was initialized with \e caps |= GEOD_LONGITUDE.
+@param[out] pazi2 pointer to the (forward) azimuth at point 2 (degrees).
+@param[out] ps12 pointer to the distance between point 1 and point 2
+  (meters); requires that \e l was initialized with \e caps |=
+  GEOD_DISTANCE.
+@param[out] pm12 pointer to the reduced length of geodesic (meters);
+  requires that \e l was initialized with \e caps |= GEOD_REDUCEDLENGTH.
+@param[out] pM12 pointer to the geodesic scale of point 2 relative to
+  point 1 (dimensionless); requires that \e l was initialized with \e caps
+  |= GEOD_GEODESICSCALE.
+@param[out] pM21 pointer to the geodesic scale of point 1 relative to
+  point 2 (dimensionless); requires that \e l was initialized with \e caps
+  |= GEOD_GEODESICSCALE.
+@param[out] pS12 pointer to the area under the geodesic
+  (meters<sup>2</sup>); requires that \e l was initialized with \e caps |=
+  GEOD_AREA.
+@return \e a12 arc length of between point 1 and point 2 (degrees).
+
+\e l must have been initialized with a call to geod_lineinit() with \e
+caps |= GEOD_DISTANCE_IN.  The value \e azi2 returned is in the range
+[&minus;180&deg;, 180&deg;).  Any of the 'return' arguments \e plat2,
+etc., may be replaced by 0, if you do not need some quantities
+computed.  Requesting a value which \e l is not capable of computing
+is not an error; the corresponding argument will not be altered.
+
+With \e flags & GEOD_LONG_UNROLL bit set, the longitude is 'unrolled' so
+that the quantity \e lon2 &minus; \e lon1 indicates how many times and in
+what sense the geodesic encircles the ellipsoid.
+
+Example, compute way points between JFK and Singapore Changi Airport
+using geod_genposition().  In this example, the points are evenly space in
+arc length (and so only approximately equally space in distance).  This is
+faster than using geod_position() would be appropriate if drawing the path
+on a map.
+
+(let ((g (pj:make-geodesic)))
+  (multiple-value-bind (a12 azi1 azi2)
+      (pj:general-inverse-problem g 40.64 -73.78 1.36 103.99)
+    (declare (ignore azi2))
+    (let ((l (pj:make-geo-line g 40.64 -73.78 azi1 '(:latitude :longitude)))))
+      (loop :for i :from 0 :to 100
+         :do (multiple-value-bind (s12 lati loni)
+                 (general-position l '(:arcmode) (* i a12 0.01))
+               (declare (ignore s12))
+               (format t \"~,5f ~,5f~%\" lati loni))))))
+"
+  (cffi:with-foreign-objects ((plat2 :double 1)
+                              (plon2 :double 1)
+                              (pazi2 :double 1)
+                              (ps12  :double 1)
+                              (pm12  :double 1)
+                              (p-M12 :double 1)
+                              (pM21  :double 1)
+                              (p-S12 :double 1))
+    (let ((a12 (geod-genposition
+                (pointer l)
+                (convert-flags-to-foreign flags 'geod-flags)
+                (float s12_a12 0.0d0)
+                plat2 plon2 pazi2 ps12
+                pm12 p-M12 pM21 p-S12)))
+      (values a12
+              (cffi:mem-aref plat2 :double 0)
+              (cffi:mem-aref plon2 :double 0)
+              (cffi:mem-aref pazi2 :double 0)
+              (cffi:mem-aref ps12  :double 0)
+              (cffi:mem-aref pm12  :double 0)
+              (cffi:mem-aref p-M12 :double 0)
+              (cffi:mem-aref pM21  :double 0)
+              (cffi:mem-aref p-S12 :double 0)))))
+(export 'general-position)
+
+;;---------------------------------------------------------
+#|
 
 (defclass geo-polygon (geo-object) ())
 (defun make-geo-polygon ())

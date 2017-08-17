@@ -123,7 +123,7 @@
 
 ;; --------------------------------------------------------
 
-(bitfield geod-mask
+(cenum (geod-mask :base-type :unsigned-int)
        ;; mask values for the \e caps argument to geod_lineinit().
        ((:none "GEOD_NONE") :documentation "Calculate nothing")
        ((:latitude "GEOD_LATITUDE") :documentation "Calculate latitude")
@@ -138,7 +138,7 @@
 
 ;; --------------------------------------------------------
 
-(bitfield geod-flags
+(cenum geod-flags
        ;; flag values for the \e flags argument to geod-gendirect and
        ;; geod-genposition
        ((:noflags "GEOD_NOFLAGS") :documentation "No flags")

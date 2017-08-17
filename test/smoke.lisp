@@ -88,10 +88,36 @@
                         :do (multiple-value-bind (lati loni azii)
                                 (pj:geo-position l (* s12 i 0.01))
                               (declare (ignore azii))
-                              (format out-b "~,5f ~,5f~%" lati loni)))))))))
-        (assert-equal str-a str-b))
-
-      ))
+                              (format out-b "~,5f ~,5f~%" lati loni))))))))
+            
+            (str-c
+             ;; An even faster way using GENERAL-POSITION
+             (with-output-to-string (out-c)
+               (let ((g (pj:make-geodesic)))
+                 (multiple-value-bind (a12 ps12 azi1 azi2)
+                     (pj:general-inverse-problem g 40.64 -73.78 1.36 103.99)
+                   (declare (ignore ps12) (ignore azi2))
+                   (let ((l (pj:make-geo-line g 40.64 -73.78 azi1 '(:latitude :longitude))))
+                     (loop :for i :from 0 :to 100
+                        :do (multiple-value-bind (s12 lati loni)
+                                (pj:general-position l '(:arcmode) (* i a12 0.01))
+                              (declare (ignore s12))
+                              ;; due to floating-point and other
+                              ;; calculation errors compare to the
+                              ;; reference data produced by the C
+                              ;; version. To reduce amount of text
+                              ;; limit to first and last 3 values
+                              (when (or (< i 3) (> i 97))
+                                (format out-c "~,3f ~,3f~%" lati loni))))))))))
+        (assert-equal str-a str-b)
+        (assert-nil (string/= str-c
+                              "40.640 -73.780
+42.019 -73.673
+43.397 -73.562
+4.128 103.869
+2.744 103.930
+1.360 103.990
+")))))
 
 ;; --------------------------------------------------------
 
