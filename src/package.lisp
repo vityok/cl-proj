@@ -114,6 +114,12 @@ Bindings for the geodesic API are also implemented.")
    :dms-to-dec
    :parse-degrees
    :simplify
-   :perpendicular-distance))
+   :perpendicular-distance
+   ;; geodesic
+   :+geodesic-version-major+ :+geodesic-version-minor+
+   :+geodesic-version-patch+ :+geodesic-version+
+   :geod-geodesic :geod-geodesicline :geod-polygon
+   :geod-mask :geod-flags
+   ))
 
 ;; EOF

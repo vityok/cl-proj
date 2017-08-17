@@ -141,7 +141,10 @@
 (lisp-unit:use-debugger T)
 
 (defun run ()
-  (format t "Proj4 version: ~a, release: ~a~%" pj:+pj-version+ pj:pj-release)
+  (format t "INFO: Running tests with Proj4 version: ~a, Geodesic: ~a.~a.~a~%~%"
+          pj:+pj-version+ 
+          pj:+geodesic-version-major+ pj:+geodesic-version-minor+
+          pj:+geodesic-version-patch+)
   (lisp-unit:print-errors
    (lisp-unit:run-tests :all (find-package 'proj-smoke-test))))
 
