@@ -9,16 +9,17 @@ CL-PROJ provides CFFI-based Common Lisp bindings for the PROJ.4
 library. It is placed under the Berkeley Software Distribution (BSD)
 license meaning that you can do almost everything you want with it.
 
-PROJ.4 homepage is: [trac.osgeo.org/proj](http://trac.osgeo.org/proj/)
+PROJ.4 homepage is: [proj4.org](http://proj4.org/)
 
-Original CL-PROJ homepage is:
-[cl-proj.sourceforge.net](http://cl-proj.sourceforge.net/) and the
-project page is: [at the
+Original CL-PROJ homepage was at the
+[cl-proj.sourceforge.net](http://cl-proj.sourceforge.net/), but
+current development and documentation is [at the
 Bitbucket](https://bitbucket.org/vityok/cl-proj).
 
-Released files can be downloaded from [the downloads
-page](http://sourceforge.net/projects/cl-proj/files). And it can also
-be installed using the [Quicklisp](https://www.quicklisp.org/) system.
+`cl-proj` can be installed using the
+[Quicklisp](https://www.quicklisp.org/) system:
+
+    (ql:quicload :cl-proj)
 
 
 Usage
@@ -52,6 +53,11 @@ functions, including:
 
 * Construction of circular lines with the given radius and center
   (like missile ranges, etc.)
+
+This package has been used to produce some maps in the
+[collection-of-maps](https://bitbucket.org/vityok/collection-of-maps)
+([Wiki](https://bitbucket.org/vityok/collection-of-maps/wiki/Home)).
+
 
 Copying
 =======
