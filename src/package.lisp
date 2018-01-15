@@ -120,6 +120,8 @@ Bindings for the geodesic API are also implemented.")
    :+geodesic-version-patch+ :+geodesic-version+
    :geod-geodesic :geod-geodesicline :geod-polygon
    :geod-mask :geod-flags
+   ;; geodesic utils
+   :missile-range
    ))
 
 ;; EOF
