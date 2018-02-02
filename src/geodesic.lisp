@@ -126,13 +126,30 @@ signifies a geodesic which is not a shortest path.  (For a prolate
 ellipsoid, an additional condition is necessary for a shortest path: the
 longitudinal extent must not exceed of 180&deg;.)
 
-Example, determine the point 10000 km NE of JFK:
+Example, determine the point 10000 km NE of JFK using low-level
+bindings:
 
-   struct geod_geodesic g;
-   double lat, lon;
-   geod_init(&g, 6378137, 1/298.257223563);
-   geod_direct(&g, 40.64, -73.78, 45.0, 10e6, &lat, &lon, 0);
-   printf(\"%.5f %.5f\n\", lat, lon);
+  (sb-int:with-float-traps-masked  (:invalid :divide-by-zero)
+    (let ((g (cffi:foreign-alloc '(:struct geod-geodesic))))
+      (geod-init g 6378137d0 (float (/ 1 298.257223563) 0.0d0))
+      (cffi:with-foreign-objects ((plat2 :double 1)
+                                  (plon2 :double 1)
+                                  (pazi2 :double 1))
+
+        (geod-direct g
+                     40.64d0 -73.78d0 45.0d0
+                     (float 10e+6 0.0d0)
+                     plat2 plon2 pazi2)
+        (format t \"~,5f ~,5f~%\"
+                (cffi:mem-aref plat2 :double 0)
+                (cffi:mem-aref plon2 :double 0)))
+      (cffi:foreign-free g)))
+  ;; => 32.62110 49.05249
+
+Both direct and indirect geodesic problems are described in great
+detail by Charles F. F. Karney in: https://arxiv.org/abs/1102.1215
+
+Use DIRECT-PROBLEM as the higher-level API instead.
 "
   (g (:pointer (:struct geod-geodesic)))
   (lat1 :double)
@@ -198,15 +215,15 @@ Example, determine the distance between JFK and Singapore Changi Airport:
 (cffi:defcfun ("geod_position" GEOD-POSITION) :void
   "@short{Compute the position along a geod_geodesicline.}
 
- @arg[l]{a pointer to the geod_geodesicline object specifying the
+ @param[in] l {a pointer to the geod_geodesicline object specifying the
    geodesic line.}
- @arg[s12]{distance between point 1 and point 2 (meters); it can be
+ @param[in] s12 {distance between point 1 and point 2 (meters); it can be
    negative.}
 
- param[out] plat2 pointer to the latitude of point 2 (degrees).
- param[out] plon2 pointer to the longitude of point 2 (degrees); requires
+ @param[out] plat2 pointer to the latitude of point 2 (degrees).
+ @param[out] plon2 pointer to the longitude of point 2 (degrees); requires
    that \e l was initialized with \e caps |= GEOD_LONGITUDE.
- param[out] pazi2 pointer to the (forward) azimuth at point 2 (degrees).
+ @param[out] pazi2 pointer to the (forward) azimuth at point 2 (degrees).
 
  \e l must have been initialized with a call to geod_lineinit() with \e
  caps |= GEOD_DISTANCE_IN.  The values of \e lon2 and \e azi2 returned are
@@ -399,6 +416,7 @@ using geod_genposition().  In this example, the points are evenly space in
 arc length (and so only approximately equally space in distance).  This is
 faster than using geod_position() would be appropriate if drawing the path
 on a map.
+
 @code{.c}
 struct geod_geodesic g;
 struct geod_geodesicline l;
@@ -1242,7 +1260,7 @@ Example, compute the area of Antarctica:
                    (cffi:mem-aref nlons :double i) (float lon 0.0d0)))
 
       (geod-polygonarea
-       (pointer g) 
+       (pointer g)
        nlats
        nlons
        (length lats)

@@ -1,7 +1,7 @@
 ;;; Different utility functions for more convenient usage of the
 ;;; Proj.4 library
 
-;; Copyright (c) 2012, 2013, 2015, 2017 Victor Anyakin
+;; Copyright (c) 2012-2018 Victor Anyakin
 ;; <anyakinvictor@yahoo.com> All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
@@ -386,7 +386,58 @@ this function with following parameters:
 
 ;;---------------------------------------------------------
 
-(defun missile-range (lat lon radius &key (count 360) (out T))
+(defparameter *cross-threshold* (float 1e-5 0.0d0))
+
+(defun antimeridian-crossing (g lat lon azi &optional distance)
+  "Given a line defined by the point with the specified latitude and
+longitude, and an azimuth, calculate coordinates of its intersection
+with the antimeridian.
+
+  (defvar *g* (pj:make-geodesic))
+  (antimeridian-crossing *g* 39.033333 125.75 90.0 (* 13000 1000))
+  ;; => 25.279533446330998d0 179.99999844054264d0 23
+
+"
+  ;; the way we are going to solve it is to descend on the approximate
+  ;; solution: given the distance to the point on the other side find
+  ;; coordinates of a point at 1/2 the distance. If it happens on our
+  ;; hemisphere seek to the right, if it is on the opposite side seek
+  ;; to the left. Continue until longitude is close enough to the
+  ;; antimeridian
+
+  ;; as we know the exact value of the longitude (+-180 depending on
+  ;; the hemisphere) what we really want to know is approximate value
+  ;; of the latitude
+
+  (format t "cross: ~,2f ~,2f ~,2f ~a~%" lat lon azi distance)
+  (iter
+    (with next-distance = distance)
+    (with step = (float (* distance 0.5d0)))
+    (for iteration from 0 below 55)
+    (format t "next-distance: ~9f~%" next-distance)
+    (multiple-value-bind (lat* lon* azi*)
+        (pj:direct-problem g lat lon azi next-distance)
+      (declare (ignore azi*))
+      (when (or (< (abs (- (abs lon*) 180)) *cross-threshold*)
+                (< (abs lon*) *cross-threshold*))
+        (return-from antimeridian-crossing (values lat* lon* iteration)))
+      (format t "remaining delta: ~a~%" (abs (- (abs lon*) 180)))
+      (if (< lon* 0) ;; western hemisphere
+          (progn
+            (format t "shorten distance: lat=~,3f&lon=~,3f~%" lat* lon*)
+            (setf next-distance (- next-distance step)
+                  step (float (* step 0.5d0))))
+          (progn
+            (format t "increase distance: lat=~,3f&lon=~,3f~%" lat* lon*)
+            (setf next-distance (+ next-distance step)
+                  step (float (* step 0.5d0))))))
+    (finally (format t "failed after ~a iterations: ~,2f ~,2f ~,2f~%" iteration lat lon azi)))
+  ;;  (format t "failed to find crossing")
+  )
+
+;;---------------------------------------------------------
+
+(defun missile-range (lat lon radius &key (count 360) (mode :one) (invert NIL) (out T))
   "Produce a GeoJSON Polygon circumscribing the ciricle with the
 given radius (in meters) with the given center.
 
@@ -407,13 +458,31 @@ application:
   ogr2ogr -f KML range.kml range.json
 "
 
-  (let ((g (pj:make-geodesic)))
-    (format out "{
-  \"type\": \"Feature\",
-  \"geometry\": {
-    \"type\": \"Polygon\",
-    \"coordinates\": [ [
-")
+  ;; As per RFC 7946: A linear ring MUST follow the right-hand rule
+  ;; with respect to the area it bounds, i.e., exterior rings are
+  ;; counterclockwise, and holes are clockwise.
+
+  ;; At the same time section 3.1.9. "Antimeridian Cutting" says that:
+  ;; In representing Features that cross the antimeridian,
+  ;; interoperability is improved by modifying their geometry. Any
+  ;; geometry that crosses the antimeridian SHOULD be represented by
+  ;; cutting it in two such that neither part's representation crosses
+  ;; the antimeridian.
+
+  ;; The antimeridian is located at longitude +-180 depending on the
+  ;; direction you are approaching it: it is +180 when approached from
+  ;; the Western hemisphere and -180 from the Eastern.
+
+  ;; the code below collects calculated points in two baskets: eastern
+  ;; and western. If the circle crosses the antimeridian both of them
+  ;; will be output as separate polygons in a MultiPolygon.
+
+  (let ((g (pj:make-geodesic))
+        (all '())
+        (eastern '())
+        (western '())
+        (split (eql mode :split))
+        (sectors (eql mode :sectors)))
     (loop
        :with step = (/ 360 count)
        :for azi :from 0 :below 360 :by step
@@ -422,14 +491,56 @@ application:
          (multiple-value-bind (lat2 lon2 azi2)
              (pj:direct-problem g lat lon azi radius)
            (declare (ignore azi2))
-           ;; in GeoJSON first comes the longitude, then latitude
-           (format out "[~,5f, ~,5f],~%" lon2 lat2))))
-    ;; close the cycle
-    (multiple-value-bind (lat2 lon2 azi2)
-        (pj:direct-problem g lat lon 0 radius)
-      (declare (ignore azi2))
-      (format out "[~,5f, ~,5f]~%" lon2 lat2))
-    (format out "] ]} }")))
+           (if split
+               ;; todo: when splitting into hemispheres the point from
+               ;; another hemisphere not only should be added there,
+               ;; but also the point on the antimeridian at the point
+               ;; of interesection with the radial arc should be added
+               ;; to this hemisphere. This should correctly specify
+               ;; the bound of the polygon of the area remaining in
+               ;; the current hemisphere and the chunk on the other
+               ;; end
+               (if (< lon2 0)
+                   (multiple-value-bind (lats lons)
+                       (antimeridian-crossing g lat lon azi radius)
+                     (push (list lons lats) western)
+                     (push (list lons lats) eastern)
+                     (push (list lon2 lat2) eastern))
+                   (push (list lon2 lat2) eastern))
+               (push (list lon2 lat2) all)))))
+
+    (format out "{
+  \"type\": \"Feature\",
+  \"geometry\": {
+    \"type\": ~s,
+    \"coordinates\": [
+"
+            (if (or split sectors) "MultiPolygon" "Polygon"))
+    ;; in GeoJSON first comes the longitude, then latitude
+    (cond
+      (split
+       ;; eastern hemisphere part first
+       (format out "[ [ ~:{ [~,5f, ~,5f],~%~}" eastern)
+       (format out "~{ [~,5f, ~,5f]~%~} ] ],~%" (first eastern)) ; close the cycle
+       ;; western hemisphere part second
+       (format out "[ [ ~:{ [~,5f, ~,5f],~%~}" western)
+       (format out "~{ [~,5f, ~,5f]~%~} ] ]~%" (first western))) ; close the cycle
+      (sectors
+       ;; split the circle into sectors, and output each sector as a
+       ;; separate polygon inside the MultiPolygon
+       (loop :with sector-size = 10
+          :while all
+          :do (loop :for i :from 0 :below sector-size
+                 :for point = (pop all)
+                 :initially (format out "[ [ [~,5f, ~,5f],~%" lon lat)
+                 :while point
+                 :do (format out "~{ [~,5f, ~,5f],~%~}" point)
+                 :finally (format out " [~,5f, ~,5f] ] ]~[,~;~]~%" lon lat (if all 0 1)))))
+      (t
+       (format out "[ ~:{ [~,5f, ~,5f],~%~}" all)
+       (format out "~{ [~,5f, ~,5f]~%~} ]~%" (first all))))
+
+    (format out "] } }")))
 
 ;;---------------------------------------------------------
 

@@ -51,7 +51,8 @@
 			 (:file "util"))))
   :depends-on (:cffi
 	       :parse-number
-               :trivial-garbage))
+               :trivial-garbage
+               :iterate))
 
 
 ;; EOF

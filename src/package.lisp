@@ -35,7 +35,7 @@
 ;; --------------------------------------------------------
 
 (defpackage :proj-types
-  (:use #:cl #:cffi)
+  (:use #:cl #:cffi #:iterate)
   (:nicknames :proj-types)
   (:documentation "Proj API types produced by groveling the proj_api.h
   header file.")
@@ -58,7 +58,7 @@
 ;; --------------------------------------------------------
 
 (defpackage :cl-proj
-  (:use :cl #:proj-types #:geodesic-types)
+  (:use :cl #:iterate #:proj-types #:geodesic-types)
   (:nicknames :pj)
   (:documentation "CL-PROJ provides bindings for the Proj.4 library.
 
