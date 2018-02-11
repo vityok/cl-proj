@@ -409,26 +409,26 @@ with the antimeridian.
   ;; the hemisphere) what we really want to know is approximate value
   ;; of the latitude
 
-  (format t "cross: ~,2f ~,2f ~,2f ~a~%" lat lon azi distance)
+  ;; (format t "cross: ~,2f ~,2f ~,2f ~a~%" lat lon azi distance)
   (iter
     (with next-distance = distance)
     (with step = (float (* distance 0.5d0)))
     (for iteration from 0 below 55)
-    (format t "next-distance: ~9f~%" next-distance)
+    ;; (format t "next-distance: ~9f~%" next-distance)
     (multiple-value-bind (lat* lon* azi*)
         (pj:direct-problem g lat lon azi next-distance)
       (declare (ignore azi*))
       (when (or (< (abs (- (abs lon*) 180)) *cross-threshold*)
                 (< (abs lon*) *cross-threshold*))
         (return-from antimeridian-crossing (values lat* lon* iteration)))
-      (format t "remaining delta: ~a~%" (abs (- (abs lon*) 180)))
+      ;; (format t "remaining delta: ~a~%" (abs (- (abs lon*) 180)))
       (if (< lon* 0) ;; western hemisphere
           (progn
-            (format t "shorten distance: lat=~,3f&lon=~,3f~%" lat* lon*)
+            ;; (format t "shorten distance: lat=~,3f&lon=~,3f~%" lat* lon*)
             (setf next-distance (- next-distance step)
                   step (float (* step 0.5d0))))
           (progn
-            (format t "increase distance: lat=~,3f&lon=~,3f~%" lat* lon*)
+            ;; (format t "increase distance: lat=~,3f&lon=~,3f~%" lat* lon*)
             (setf next-distance (+ next-distance step)
                   step (float (* step 0.5d0))))))
     (finally (format t "failed after ~a iterations: ~,2f ~,2f ~,2f~%" iteration lat lon azi)))
@@ -477,38 +477,55 @@ application:
   ;; and western. If the circle crosses the antimeridian both of them
   ;; will be output as separate polygons in a MultiPolygon.
 
+  ;; lon is x, lat is y
   (let ((g (pj:make-geodesic))
         (all '())
         (eastern '())
         (western '())
+	(amc '()) ; amc - points on the antimeridian
         (split (eql mode :split))
         (sectors (eql mode :sectors)))
-    (loop
-       :with step = (/ 360 count)
-       :for azi :from 0 :below 360 :by step
-       :do
-       (progn
-         (multiple-value-bind (lat2 lon2 azi2)
-             (pj:direct-problem g lat lon azi radius)
-           (declare (ignore azi2))
-           (if split
-               ;; todo: when splitting into hemispheres the point from
-               ;; another hemisphere not only should be added there,
-               ;; but also the point on the antimeridian at the point
-               ;; of interesection with the radial arc should be added
-               ;; to this hemisphere. This should correctly specify
-               ;; the bound of the polygon of the area remaining in
-               ;; the current hemisphere and the chunk on the other
-               ;; end
-               (if (< lon2 0)
-                   (multiple-value-bind (lats lons)
-                       (antimeridian-crossing g lat lon azi radius)
-                     (push (list lons lats) western)
-                     (push (list lons lats) eastern)
-                     (push (list lon2 lat2) eastern))
-                   (push (list lon2 lat2) eastern))
-               (push (list lon2 lat2) all)))))
+    (iter
+      (with step = (/ 360 count))
+      (for azi from 0 below 360 by step)
+      (multiple-value-bind (lat2 lon2 azi2)
+	  (pj:direct-problem g lat lon azi radius)
+	(declare (ignore azi2))
+	(if split
+	    ;; todo: when splitting into hemispheres the point from
+	    ;; another hemisphere not only should be added there,
+	    ;; but also the point on the antimeridian at the point
+	    ;; of interesection with the radial arc should be added
+	    ;; to this hemisphere. This should correctly specify
+	    ;; the bound of the polygon of the area remaining in
+	    ;; the current hemisphere and the chunk on the other
+	    ;; end
+	    (if (< lon2 0)
+		;; point on the western hemisphere
+		(multiple-value-bind (lat-am lon-am)
+		    ;; lat-am is where radius crosses
+		    ;; antimeridian. lon-am is close to -180 in W, to
+		    ;; +180 in E hemisphere
+		    (antimeridian-crossing g lat lon azi radius)
+		  (push (list -180.0d0 lat-am) amc)
+		  (push (list lon2 lat2) western)
+		  ;; eastern feature will be cut by antimeridian
+		  (push (list +180.0d0 lat-am) eastern)
+		  )
+		(push (list lon2 lat2) eastern))
 
+	    ;; do not split by antimeridian
+	    (push (list lon2 lat2) all))))
+
+    (when amc
+      ;; there are points on the antimeridian, they have to be sorted
+      ;; and added to the part of the feature on he western hemisphere
+
+      ;; existing points in the western list are the outer points and
+      ;; must be sorted from south to the north
+      (setf western (sort western #'> :key #'second))
+      (nconc western (sort amc #'< :key #'second)))
+    
     (format out "{
   \"type\": \"Feature\",
   \"geometry\": {
@@ -528,14 +545,15 @@ application:
       (sectors
        ;; split the circle into sectors, and output each sector as a
        ;; separate polygon inside the MultiPolygon
-       (loop :with sector-size = 10
-          :while all
-          :do (loop :for i :from 0 :below sector-size
-                 :for point = (pop all)
-                 :initially (format out "[ [ [~,5f, ~,5f],~%" lon lat)
-                 :while point
-                 :do (format out "~{ [~,5f, ~,5f],~%~}" point)
-                 :finally (format out " [~,5f, ~,5f] ] ]~[,~;~]~%" lon lat (if all 0 1)))))
+       (iter
+	 (with sector-size = 10)
+	 (while all)
+	 (loop :for i :from 0 :below sector-size
+	    :for point = (pop all)
+	    :initially (format out "[ [ [~,5f, ~,5f],~%" lon lat)
+	    :while point
+	    :do (format out "~{ [~,5f, ~,5f],~%~}" point)
+	    :finally (format out " [~,5f, ~,5f] ] ]~[,~;~]~%" lon lat (if all 0 1)))))
       (t
        (format out "[ ~:{ [~,5f, ~,5f],~%~}" all)
        (format out "~{ [~,5f, ~,5f]~%~} ]~%" (first all))))
