@@ -418,8 +418,7 @@ with the antimeridian.
     (multiple-value-bind (lat* lon* azi*)
         (pj:direct-problem g lat lon azi next-distance)
       (declare (ignore azi*))
-      (when (or (< (abs (- (abs lon*) 180)) *cross-threshold*)
-                (< (abs lon*) *cross-threshold*))
+      (when (< (abs (- (abs lon*) 180)) *cross-threshold*)
         (return-from antimeridian-crossing (values lat* lon* iteration)))
       ;; (format t "remaining delta: ~a~%" (abs (- (abs lon*) 180)))
       (if (< lon* 0) ;; western hemisphere
@@ -437,7 +436,7 @@ with the antimeridian.
 
 ;;---------------------------------------------------------
 
-(defun missile-range (lat lon radius &key (count 360) (mode :one) (invert NIL) (out T))
+(defun missile-range (lat lon radius &key (count 360) (mode :one) (out T))
   "Produce a GeoJSON Polygon circumscribing the ciricle with the
 given radius (in meters) with the given center.
 
@@ -456,6 +455,11 @@ Google Earth-compatible KML) with the ogr2ogr command-line
 application:
 
   ogr2ogr -f KML range.kml range.json
+
+Since the range can be large enough to cross antimeridian, the
+function takes care to follow GeoJSON specification, section 3.1.9
+antimeridian cutting and splits the polygon in two pieces (when MODE
+is :SPLIT).
 "
 
   ;; As per RFC 7946: A linear ring MUST follow the right-hand rule
@@ -500,13 +504,16 @@ application:
 	    ;; the bound of the polygon of the area remaining in
 	    ;; the current hemisphere and the chunk on the other
 	    ;; end
-	    (if (< lon2 0)
+	    (if (and (and (> azi 0)
+			  (< azi 180))
+		     (< lon2 0))
 		;; point on the western hemisphere
 		(multiple-value-bind (lat-am lon-am)
 		    ;; lat-am is where radius crosses
 		    ;; antimeridian. lon-am is close to -180 in W, to
 		    ;; +180 in E hemisphere
 		    (antimeridian-crossing g lat lon azi radius)
+		  (declare (ignore lon-am))
 		  (push (list -180.0d0 lat-am) amc)
 		  (push (list lon2 lat2) western)
 		  ;; eastern feature will be cut by antimeridian
@@ -525,7 +532,7 @@ application:
       ;; must be sorted from south to the north
       (setf western (sort western #'> :key #'second))
       (nconc western (sort amc #'< :key #'second)))
-    
+
     (format out "{
   \"type\": \"Feature\",
   \"geometry\": {
