@@ -554,13 +554,16 @@ is :SPLIT).
        ;; separate polygon inside the MultiPolygon
        (iter
 	 (with sector-size = 10)
+	 (with prev-point = (pop all))
 	 (while all)
-	 (loop :for i :from 0 :below sector-size
-	    :for point = (pop all)
-	    :initially (format out "[ [ [~,5f, ~,5f],~%" lon lat)
-	    :while point
-	    :do (format out "~{ [~,5f, ~,5f],~%~}" point)
-	    :finally (format out " [~,5f, ~,5f] ] ]~[,~;~]~%" lon lat (if all 0 1)))))
+	 (iter
+	   (for i from 0 below sector-size)
+	   (for point = (pop all))
+	   (initially (format out "[ [ [~,5f, ~,5f],~%~{ [~,5f, ~,5f],~}~%" lon lat prev-point))
+	   (while point)
+	   (format out "~{ [~,5f, ~,5f],~%~}" point)
+	   (finally (format out " [~,5f, ~,5f] ] ]~[,~;~]~%" lon lat (if all 0 1))
+		    (setf prev-point point)))))
       (t
        (format out "[ ~:{ [~,5f, ~,5f],~%~}" all)
        (format out "~{ [~,5f, ~,5f]~%~} ]~%" (first all))))
