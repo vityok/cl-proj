@@ -430,7 +430,7 @@ with the antimeridian.
             ;; (format t "increase distance: lat=~,3f&lon=~,3f~%" lat* lon*)
             (setf next-distance (+ next-distance step)
                   step (float (* step 0.5d0))))))
-    (finally (format t "failed after ~a iterations: ~,2f ~,2f ~,2f~%" iteration lat lon azi)))
+    (finally (format t "failed after ~a iterations: lat=~,2f lon=~,2f azi=~,2f~%" iteration lat lon azi)))
   ;;  (format t "failed to find crossing")
   )
 
@@ -490,8 +490,9 @@ is :SPLIT).
         (split (eql mode :split))
         (sectors (eql mode :sectors)))
     (iter
+      (with hemi = -1)
       (with step = (/ 360 count))
-      (for azi from 0 below 360 by step)
+      (for azi from -180.00 below 180.00 by step)
       (multiple-value-bind (lat2 lon2 azi2)
 	  (pj:direct-problem g lat lon azi radius)
 	(declare (ignore azi2))
@@ -504,8 +505,8 @@ is :SPLIT).
 	    ;; the bound of the polygon of the area remaining in
 	    ;; the current hemisphere and the chunk on the other
 	    ;; end
-	    (if (and (and (> azi 0)
-			  (< azi 180))
+	    (if (and (and (> azi 0.00)
+			  (< azi 180.00))
 		     (< lon2 0))
 		;; point on the western hemisphere
 		(multiple-value-bind (lat-am lon-am)
@@ -518,8 +519,15 @@ is :SPLIT).
 		  (push (list lon2 lat2) western)
 		  ;; eastern feature will be cut by antimeridian
 		  (push (list +180.0d0 lat-am) eastern)
+		  (when (< hemi 0)
+		    (format t "crossing~%")
+		    (setf hemi 1))
 		  )
-		(push (list lon2 lat2) eastern))
+		(progn 
+		  (push (list lon2 lat2) eastern)
+		  (when (> hemi 0)
+		    (format t "crossing~%")
+		    (setf hemi -1))))
 
 	    ;; do not split by antimeridian
 	    (push (list lon2 lat2) all))))
