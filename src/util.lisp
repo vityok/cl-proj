@@ -486,9 +486,10 @@ is :SPLIT).
         (all '())
         (eastern '())
         (western '())
-	(amc '()) ; amc - points on the antimeridian
-        (split (eql mode :split))
-        (sectors (eql mode :sectors)))
+	(amc '())		    ; amc - points on the antimeridian
+        (mode-split (eql mode :split))
+	(mode-one (eql mode :one))
+        )
     (iter
       (with hemi = -1)
       (with step = (/ 360 count))
@@ -496,7 +497,7 @@ is :SPLIT).
       (multiple-value-bind (lat2 lon2 azi2)
 	  (pj:direct-problem g lat lon azi radius)
 	(declare (ignore azi2))
-	(if split
+	(if mode-split
 	    ;; todo: when splitting into hemispheres the point from
 	    ;; another hemisphere not only should be added there,
 	    ;; but also the point on the antimeridian at the point
@@ -505,29 +506,39 @@ is :SPLIT).
 	    ;; the bound of the polygon of the area remaining in
 	    ;; the current hemisphere and the chunk on the other
 	    ;; end
-	    (if (and (and (> azi 0.00)
-			  (< azi 180.00))
-		     (< lon2 0))
-		;; point on the western hemisphere
-		(multiple-value-bind (lat-am lon-am)
-		    ;; lat-am is where radius crosses
-		    ;; antimeridian. lon-am is close to -180 in W, to
-		    ;; +180 in E hemisphere
-		    (antimeridian-crossing g lat lon azi radius)
-		  (declare (ignore lon-am))
-		  (push (list -180.0d0 lat-am) amc)
-		  (push (list lon2 lat2) western)
-		  ;; eastern feature will be cut by antimeridian
-		  (push (list +180.0d0 lat-am) eastern)
-		  (when (< hemi 0)
-		    (format t "crossing~%")
-		    (setf hemi 1))
-		  )
-		(progn 
-		  (push (list lon2 lat2) eastern)
-		  (when (> hemi 0)
-		    (format t "crossing~%")
-		    (setf hemi -1))))
+	    (cond
+	      ((and (and (> azi 0.00)
+			 (< azi 180.00))
+		    (< lon2 0))
+	       #+ignore
+	       (when (< hemi 0)
+		 (format t "crossing->west: ~a - lon=~a, lat=~a~%" (first eastern) lon2 lat2)
+		 (push (list lon2 90.0) eastern)
+		 (format t "last east: ~a~%" (last eastern))
+		 (setf hemi 1))
+
+	       ;; point on the western hemisphere
+	       (multiple-value-bind (lat-am lon-am)
+		   ;; lat-am is where radius crosses
+		   ;; antimeridian. lon-am is close to -180 in W, to
+		   ;; +180 in E hemisphere
+		   (antimeridian-crossing g lat lon azi radius)
+		 (declare (ignore lon-am))
+		 (push (list -180.0d0 lat-am) amc)
+		 (push (list lon2 lat2) western)
+		 ;; eastern feature will be cut by antimeridian
+		 (push (list +180.0d0 lat-am) eastern)
+		 
+		 ))
+	      (t
+#+ignore
+	       (when (> hemi 0)
+		 (format t "crossing->east: ~a - lon=~a, lat=~a~%" (first eastern) lon2 lat2)
+		 (push (list lon2 90.0) eastern)
+		 (setf hemi -1))
+
+	       (push (list lon2 lat2) eastern)
+	       ))
 
 	    ;; do not split by antimeridian
 	    (push (list lon2 lat2) all))))
@@ -540,39 +551,34 @@ is :SPLIT).
       ;; must be sorted from south to the north
       (setf western (sort western #'> :key #'second))
       (nconc western (sort amc #'< :key #'second)))
-
+    
     (format out "{
   \"type\": \"Feature\",
   \"geometry\": {
     \"type\": ~s,
     \"coordinates\": [
 "
-            (if (or split sectors) "MultiPolygon" "Polygon"))
+            (if mode-split "MultiPolygon" "Polygon"))
     ;; in GeoJSON first comes the longitude, then latitude
     (cond
-      (split
+
+      (mode-split
        ;; eastern hemisphere part first
-       (format out "[ [ ~:{ [~,5f, ~,5f],~%~}" eastern)
+       (format out "[ [~% ~:{ [~,5f, ~,5f],~%~}" eastern)
        (format out "~{ [~,5f, ~,5f]~%~} ] ],~%" (first eastern)) ; close the cycle
        ;; western hemisphere part second
-       (format out "[ [ ~:{ [~,5f, ~,5f],~%~}" western)
+       (format out "[ [~% ~:{ [~,5f, ~,5f],~%~}" western)
        (format out "~{ [~,5f, ~,5f]~%~} ] ]~%" (first western))) ; close the cycle
-      (sectors
-       ;; split the circle into sectors, and output each sector as a
-       ;; separate polygon inside the MultiPolygon
-       (iter
-	 (with sector-size = 10)
-	 (with prev-point = (pop all))
-	 (while all)
-	 (iter
-	   (for i from 0 below sector-size)
-	   (for point = (pop all))
-	   (initially (format out "[ [ [~,5f, ~,5f],~%~{ [~,5f, ~,5f],~}~%" lon lat prev-point))
-	   (while point)
-	   (format out "~{ [~,5f, ~,5f],~%~}" point)
-	   (finally (format out " [~,5f, ~,5f] ] ]~[,~;~]~%" lon lat (if all 0 1))
-		    (setf prev-point point)))))
-      (t
+
+      
+      (mode-one
+       (setf all (sort all #'< :key #'first))
+       (setf all (concatenate 'list
+			      '((-180.0 90.0))
+			      `((-180.0 ,(second (first all))))
+			      all
+			      `((180.0 ,(second (car (last all)))))
+			      '((180 90.0))))
        (format out "[ ~:{ [~,5f, ~,5f],~%~}" all)
        (format out "~{ [~,5f, ~,5f]~%~} ]~%" (first all))))
 
