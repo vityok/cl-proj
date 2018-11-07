@@ -19,8 +19,12 @@ Bitbucket](https://bitbucket.org/vityok/cl-proj).
 `cl-proj` can be installed using the
 [Quicklisp](https://www.quicklisp.org/) system:
 
-    (ql:quicload :cl-proj)
+    (ql:quickload :cl-proj)
 
+Depending on your system configuration you might have to install
+`libproj9` and `libproj-dev` packages (for example, on recent Ubuntu
+distributions) as `cl-proj` relies on CFFI Groveler to correclty map
+Lisp bindings to the native API.
 
 Usage
 =====
